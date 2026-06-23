@@ -1,30 +1,11 @@
-from flask import Flask,request,jsonify 
-import os 
-from werkzeug.utils import secure_filename
+import sys
+import os
 
-app = Flask(__name__)
-UPLOAD_FOLDER = "Uploads"
+# Projenin kök dizinini Python yoluna ekle
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-#Enpoint to upload a file
-@app.route("/api/ocr",methods=["POST"])
-def upload_image():
-    if "file" not in request.files:
-        return jsonify({"success":False, "error":"Dosya alanı eksik"}), 400
-    file = request.files["file"]
-
-    if file.filename == "":
-        return jsonify({"success":False,"error":"Dosya adı boş"}),400
-    
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(file_path)
-
-
-    return jsonify({"success":True,"message":"Dosya başarıyla yüklendi", "filename": filename}), 200
+from Proje.app import app
 
 if __name__ == '__main__':
+    print("🚀 OCR Belge Okuma ve Otomasyon Sistemi başlatılıyor...")
     app.run(debug=True)
