@@ -1,42 +1,48 @@
-Erasmus-Staj-OCR-Tabanlı-Belge-Okuma-ve-Otomasyon-Sistemi
-Erasmus Staj Projesi
+# 📄 Erasmus Staj Projesi: OCR Belge Analiz & Otomasyon Sistemi
 
-📄 Genel Amaçlı OCR Belge Tanıma ve Otomasyon Sistemi
-Bu proje, kullanıcının yüklediği görsel belgelerden (fatura, sözleşme, notlar, el yazısı vb.) Türkçe metin çıkarımı yapabilen, web arayüzü üzerinden çalışan, Docker ile kapsüllenmiş ve n8n ile otomasyon destekli bir sistemdir.
+Bu proje; yüklenen görsel (PNG, JPG vb.) ve PDF dökümanlarından metin çıkarımı (OCR) yapabilen, döküman içeriklerini (beceriler, eğitim, iletişim bilgileri vb.) akıllı algoritmalarla analiz eden ve elde edilen verileri n8n gibi otomasyon sistemlerine aktaran web tabanlı bir entegrasyon uygulamasıdır.
 
-🎯 Proje Amacı
-Görsellerden genel metin çıkarımı (OCR).
+---
 
-Web tabanlı yükleme arayüzü.
+## 🎯 Proje Amacı
 
-Docker ile taşınabilirlik.
+- **OCR Belge Tanıma**: Görsellerden ve PDF sayfalarından metin okuma.
+- **Akıllı Veri Analizi**: CV/Döküman metinlerinden beceri (skills), e-posta, telefon ve eğitim bilgilerini otomatik ayıklama.
+- **SQLite Geçmiş Yönetimi**: Yüklenen son 15 belgeyi yerel veritabanında saklama ve geçmişe kolayca erişme.
+- **n8n Otomasyonu**: Analiz çıktılarını tek tıkla n8n iş akışlarına/webhook'larına yönlendirme.
+- **Ön İşleme (OpenCV)**: Açı düzeltme (auto-deskew) ve eşikleme gibi görüntü iyileştirme adımlarını dinamik yönetme.
 
-n8n ile belge yönetimi, kaydetme ve otomasyon.
+---
 
-🛠️ Kullanılan Teknolojiler
-Teknoloji	Açıklama
-Python	Ana programlama dili
-Flask	Web arayüzü
-OpenCV	Görüntü işleme (grayscale, thresholding vb.)
-Tesseract OCR	Türkçe metin çıkarımı
-Docker	Uygulama konteynerizasyonu
-n8n	Otomasyon ve dış sistemlerle entegrasyon
-Google Sheets / PostgreSQL	Metin çıktısının kaydedilmesi (isteğe bağlı)
+## ⚙️ Uygulama Akışı
 
-💡 Kullanım Senaryoları
-Ders notlarından veya kitap sayfalarından metin çıkarma
+```mermaid
+graph TD
+    A[Kullanıcı Görsel/PDF Yükler] --> B[OpenCV Ön İşleme: Deskew / Thresholding]
+    B --> C[Tesseract OCR: Metin Çıkarımı]
+    C --> D[Regex & NLP Analiz: İletişim, Eğitim, Beceriler]
+    D --> E[SQLite: Veri Kaydı ve Geçmiş Güncellemesi]
+    E --> F[n8n / Webhook: Otomasyon Tetikleme]
+```
 
-Fatura ve fiş gibi belgelerin dijitalleştirilmesi
+---
 
-El yazısı metinlerin OCR ile tanınması (performans kısıtlı olabilir)
+## 🛠️ Kullanılan Teknolojiler
 
-Belge arşivleme ve içerik kayıt sistemleri
+- **Backend**: Python (Flask)
+- **OCR & Görüntü İşleme**: Tesseract OCR, OpenCV (cv2)
+- **Veritabanı**: SQLite
+- **Frontend**: HTML5, Vanilla CSS (Minimalist Vintage Tema), Vanilla JS
+- **Otomasyon/Konteyner**: n8n, Docker, docker-compose
 
-27.07.2025 
-<img width="1536" height="844" alt="image" src="https://github.com/user-attachments/assets/1249d351-5136-4ca0-bbae-245fbeed52b2" />
+---
 
+## 🚀 Projeyi Başlatma
 
-👤 Geliştirici
-Süleyman Sardoğan
-Yazılım Mühendisliği 2025 Erasmus Staj Projesi
-GitHub Profili
+Sunucuyu yerel olarak ayağa kaldırmak için:
+
+```bash
+python3 app.py
+```
+
+Ardından tarayıcınızda **`http://127.0.0.1:5001`** adresine gidebilirsiniz.

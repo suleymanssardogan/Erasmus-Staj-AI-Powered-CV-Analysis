@@ -1,0 +1,229 @@
+{
+  "name": "OCR Automation Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-id",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "path": "ocr-trigger",
+        "options": {}
+      },
+      "id": "webhook-trigger-id",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        180,
+        420
+      ],
+      "webhookId": "ocr-webhook-uuid"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/app/Proje/testocr.png"
+      },
+      "id": "read-file-id",
+      "name": "Read Local Test Image",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://web:5000/api/ocr",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-request-id",
+      "name": "Call Flask OCR API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "set",
+        "fields": {
+          "values": [
+            {
+              "name": "dosya_adi",
+              "value": "={{ $json.filename }}"
+            },
+            {
+              "name": "okunan_metin",
+              "value": "={{ $json.extracted_text }}"
+            },
+            {
+              "name": "karakter_sayisi",
+              "type": "number",
+              "value": "={{ $json.char_count }}"
+            },
+            {
+              "name": "islem_suresi",
+              "type": "number",
+              "value": "={{ $json.processing_time }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-fields-id",
+      "name": "Format OCR Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        820,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "fileContent": "=Tarih: {{ new Date().toLocaleString() }}\nDosya Adı: {{ $json.dosya_adi }}\nOkunan Metin:\n-------------------------\n{{ $json.okunan_metin }}\n-------------------------\nKarakter Sayısı: {{ $json.karakter_sayisi }}\nİşlem Süresi: {{ $json.islem_suresi }} sn\n\n\n",
+        "filePath": "/app/uploads/ocr_automation_log.txt",
+        "append": true,
+        "options": {}
+      },
+      "id": "write-file-id",
+      "name": "Append to Log File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tarih": "=new Date().toLocaleString()",
+            "Dosya Adı": "={{ $json.dosya_adi }}",
+            "Okunan Metin": "={{ $json.okunan_metin }}",
+            "Karakter Sayısı": "={{ $json.karakter_sayisi }}",
+            "İşlem Süresi": "={{ $json.islem_suresi }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "google-sheets-id",
+      "name": "Add Row to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1040,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Local Test Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Flask OCR API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Local Test Image": {
+      "main": [
+        [
+          {
+            "node": "Call Flask OCR API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Flask OCR API": {
+      "main": [
+        [
+          {
+            "node": "Format OCR Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format OCR Results": {
+      "main": [
+        [
+          {
+            "node": "Append to Log File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add Row to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ocr-automation-version-id",
+  "id": "ocr-automation-workflow",
+  "meta": {
+    "templateId": "ocr-automation"
+  }
+}

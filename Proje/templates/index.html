@@ -3,55 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR Belge Sistemi</title>
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Static CSS Link -->
+    <title>AI Resume Analyzer - SaaS Özgeçmiş & ATS Analiz Platformu</title>
+    <!-- CSS Link -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <span class="logo-dot"></span>
+                AI Resume Analyzer
+            </a>
+            <div class="nav-links">
+                <a href="#features">Özellikler</a>
+                <a href="#how-it-works">Nasıl Çalışır</a>
+                <a href="#pricing">Fiyatlandırma</a>
+            </div>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-btn" aria-label="Tema Değiştir">
+                    <span class="icon-light">☀️</span>
+                    <span class="icon-dark" style="display: none;">🌙</span>
+                </button>
+                <div id="navAuthButtons" class="nav-auth-buttons">
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">Giriş Yap</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-nav">Başlayın</a>
+                </div>
+                <div id="navUserProfile" class="nav-user-profile" style="display: none;">
+                    <img id="userAvatar" src="" alt="Profil" class="user-avatar-img">
+                    <span id="userName" class="user-name-text"></span>
+                    <button onclick="logoutUser()" class="btn btn-secondary btn-sm-logout" style="padding: 6px 12px; font-size: 0.8rem;">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
-        <header>
-            <h1 class="logo">📄 OCR Belge Sistemi</h1>
-            <p class="subtitle">Belgelerinizi saniyeler içinde metne dönüştürün</p>
-        </header>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="badge-new">✨ AI-Powered Career Assistant</div>
+                <h1 class="hero-title">
+                    Analyze Your <span class="gradient-text">Resume</span> with AI
+                </h1>
+                <p class="hero-subtitle">
+                    Upload your CV and receive an AI-powered analysis in seconds. The system evaluates ATS Compatibility, Missing Skills, Resume Score, Strengths & Weaknesses, and professional recommendations.
+                </p>
+                <div class="hero-ctas">
+                    <a href="#playground" class="btn btn-primary btn-hero">Analyze Resume</a>
+                    <a href="#demo" class="btn btn-secondary btn-hero">View Demo</a>
+                </div>
+            </div>
+            
+            <!-- Dashboard Mockup on Hero Right -->
+            <div class="hero-mockup">
+                <div class="mockup-frame">
+                    <div class="mockup-header">
+                        <span class="window-dot red"></span>
+                        <span class="window-dot yellow"></span>
+                        <span class="window-dot green"></span>
+                        <span class="mockup-title">AI Resume Analyzer Dashboard</span>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-sidebar">
+                            <div class="sidebar-item active">📁 resume_dev_2026.pdf</div>
+                            <div class="sidebar-item">📄 cv_designer.png</div>
+                            <div class="sidebar-item">⚙️ Settings</div>
+                        </div>
+                        <div class="mockup-main">
+                            <div class="mockup-flex" style="justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div class="mockup-label">File Size</div>
+                                    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: #27c93f;">242 KB</h3>
+                                </div>
+                                <div>
+                                    <div class="mockup-label">Document Type</div>
+                                    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--accent-purple);">PDF Format</h3>
+                                </div>
+                            </div>
+                            <div class="mockup-section">
+                                <div class="mockup-label">Missing Skills</div>
+                                <div class="mockup-flex">
+                                    <div class="mockup-badge" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56;">TypeScript</div>
+                                    <div class="mockup-badge" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56;">AWS</div>
+                                    <div class="mockup-badge" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56;">Docker</div>
+                                </div>
+                            </div>
+                            <div class="mockup-section">
+                                <div class="mockup-label">AI Suggestions</div>
+                                <p class="mockup-text">• Add quantitative metrics to your experience section.<br>• Expand your project descriptions with technical stack details.</p>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem; border-radius: 8px; width: 100%;" onclick="document.getElementById('playground').scrollIntoView();">Download PDF Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <div class="main-content">
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Neden AI Resume Analyzer?</h2>
+            <p class="section-subtitle">Gelişmiş AI özellikleri ile kariyerinizi bir üst seviyeye taşıyın.</p>
+        </div>
+        <div class="features-grid">
+            <div class="saas-card">
+                <div class="saas-card-icon">🧠</div>
+                <h3 class="saas-card-title">AI Resume Analysis</h3>
+                <p class="saas-card-desc">Understand strengths, weaknesses and overall resume quality through advanced semantic intelligence.</p>
+            </div>
+            <div class="saas-card">
+                <div class="saas-card-icon">📊</div>
+                <h3 class="saas-card-title">ATS Compatibility</h3>
+                <p class="saas-card-desc">Check whether your resume can pass Applicant Tracking Systems (ATS) and avoid screening filters.</p>
+            </div>
+            <div class="saas-card">
+                <div class="saas-card-icon">🔍</div>
+                <h3 class="saas-card-title">Skill Gap Detection</h3>
+                <p class="saas-card-desc">Identify missing technical and soft skills based on target positions and market demands.</p>
+            </div>
+            <div class="saas-card">
+                <div class="saas-card-icon">💡</div>
+                <h3 class="saas-card-title">AI Recommendations</h3>
+                <p class="saas-card-desc">Receive actionable and domain-specific suggestions to instantly improve your resume structure and wording.</p>
+            </div>
+            <div class="saas-card">
+                <div class="saas-card-icon">🏆</div>
+                <h3 class="saas-card-title">Resume Scoring</h3>
+                <p class="saas-card-desc">Generate an overall resume score with detailed feedback comparing you to similar industry peers.</p>
+            </div>
+            <div class="saas-card">
+                <div class="saas-card-icon">💾</div>
+                <h3 class="saas-card-title">Download Report</h3>
+                <p class="saas-card-desc">Export a professional PDF report containing direct AI insights, suggestions, and ATS evaluation notes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section bg-light">
+        <div class="section-header">
+            <h2 class="section-title">Nasıl Çalışır?</h2>
+            <p class="section-subtitle">Sadece 4 kolay adımda özgeçmişinizi mülakata hazır hale getirin.</p>
+        </div>
+        <div class="timeline-container">
+            <div class="timeline-step">
+                <div class="step-num">1</div>
+                <div class="step-icon">👤</div>
+                <h4 class="step-title">Hesap Oluştur</h4>
+                <p class="step-desc">Hızlıca kayıt olun ve analiz panelinize anında erişin.</p>
+            </div>
+            <div class="timeline-arrow">➔</div>
+            <div class="timeline-step">
+                <div class="step-num">2</div>
+                <div class="step-icon">📤</div>
+                <h4 class="step-title">CV Yükle</h4>
+                <p class="step-desc">PDF veya görsel formatındaki özgeçmişinizi sürükleyip bırakın.</p>
+            </div>
+            <div class="timeline-arrow">➔</div>
+            <div class="timeline-step">
+                <div class="step-num">3</div>
+                <div class="step-icon">🤖</div>
+                <h4 class="step-title">AI Analizi</h4>
+                <p class="step-desc">Yapay zeka CV içeriğini ATS ve beceri uyumuna göre analiz etsin.</p>
+            </div>
+            <div class="timeline-arrow">➔</div>
+            <div class="timeline-step">
+                <div class="step-num">4</div>
+                <div class="step-icon">📄</div>
+                <h4 class="step-title">Raporu Al</h4>
+                <p class="step-desc">Tüm zayıf yönleri, puanları ve beceri eksikliklerini rapor halinde alın.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section id="demo" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Kariyer Panel Önizlemesi</h2>
+            <p class="section-subtitle">Döküman analizi ve profesyonel kariyer panelinin tasarımı.</p>
+        </div>
+        
+        <div class="saas-dashboard-preview">
+            <!-- Sidebar -->
+            <div class="dash-sidebar">
+                <div class="dash-logo">📁 Resume Analyzer</div>
+                <div class="dash-nav-group">
+                    <div class="dash-nav-item active">📊 Dashboard</div>
+                    <div class="dash-nav-item">📤 Upload Resume</div>
+                    <div class="dash-nav-item">📂 Analysis History</div>
+                    <div class="dash-nav-item">📄 Reports</div>
+                    <div class="dash-nav-item">👤 Profile</div>
+                    <div class="dash-nav-item">⚙️ Settings</div>
+                </div>
+            </div>
+            <!-- Main dashboard panel -->
+            <div class="dash-main">
+                <div class="dash-main-header">
+                    <div class="dash-title">Önizleme: <b>resume_software_engineer.pdf</b></div>
+                    <div class="dash-flex" style="display:flex; gap:10px;">
+                        <div class="dash-score" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border-color: rgba(37,99,235,0.2);">Tür: <b>CV (Özgeçmiş)</b></div>
+                        <div class="dash-score" style="background: rgba(39, 201, 63, 0.1); color: #27c93f; border-color: rgba(39,201,63,0.2);">Durum: <b>Analiz Edildi</b></div>
+                    </div>
+                </div>
+                <div class="dash-grid">
+                    <div class="dash-panel-card col-8" style="font-size: 0.85rem;">
+                        <div class="dash-panel-label" style="display:flex; justify-content:space-between;">
+                            <span>Güçlü Yönler</span>
+                            <span style="color: #27c93f;">✔ Çok Güçlü</span>
+                        </div>
+                        <p class="dash-panel-text" style="margin-bottom: 15px;">• Python, Javascript ve SQL gibi aranan teknik dillerde tam yetkinlik.<br>• Proje geliştirme ve staj tecrübelerinin dökümünde kullanılan aktif dil seviyesi oldukça yüksek.</p>
+                        
+                        <div class="dash-panel-label" style="display:flex; justify-content:space-between; border-top: 1px solid #27272a; padding-top: 15px;">
+                            <span>Zayıf Yönler</span>
+                            <span style="color: #ff5f56;">⚠ İyileştirilmeli</span>
+                        </div>
+                        <p class="dash-panel-text">• Deneyimlerde yapılan işlerin ölçülebilir iş sonuçları (KPI/Metrikler) belirtilmemiş.<br>• İletişim yeteneği ve sunum gibi sosyal becerilere yeterince yer verilmemiş.</p>
+                    </div>
+                    <div class="dash-panel-card col-4">
+                        <div class="dash-panel-label">Eksik Beceriler (Skill Gap)</div>
+                        <div class="dash-meta-badge-flex" style="margin-bottom: 15px;">
+                            <span class="meta-badge badge-url" style="background:rgba(255,95,86,0.1); color:#ff5f56; border-color:rgba(255,95,86,0.2);">Docker</span>
+                            <span class="meta-badge badge-url" style="background:rgba(255,95,86,0.1); color:#ff5f56; border-color:rgba(255,95,86,0.2);">AWS</span>
+                            <span class="meta-badge badge-url" style="background:rgba(255,95,86,0.1); color:#ff5f56; border-color:rgba(255,95,86,0.2);">TypeScript</span>
+                        </div>
+                        <div class="dash-panel-label">Yapay Zeka Önerileri</div>
+                        <p class="dash-panel-text" style="font-size: 0.8rem; line-height: 1.4;">Özgeçmişinizi ATS tarayıcılarına uygun hale getirmek için başlık fontlarını standartlaştırın ve en çok aranan Docker/AWS yeteneklerinizi projelerinize dahil edin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE APP DASHBOARD (PLAYGROUND) -->
+    <section id="playground" class="section bg-light border-y">
+        <div class="section-header">
+            <h2 class="section-title">Canlı CV Analiz Arayüzü</h2>
+            <p class="section-subtitle">PDF formatındaki CV'nizi yükleyerek sistemi canlı olarak test edebilirsiniz.</p>
+        </div>
+
+        <div class="main-content container">
+            <!-- Left Panel: File Input, OpenCV settings, SQLite History -->
             <div class="upload-section">
                 <h2 class="section-title">
                     <span class="section-icon">📤</span>
-                    Belge Yükle
+                    CV Yükleme Paneli
                 </h2>
                 
                 <form id="ocrForm" onsubmit="event.preventDefault(); processDocument();">
-                    <div class="upload-area" onclick="document.getElementById('fileInput').click();">
-                        <div class="upload-icon">📎</div>
-                        <div class="upload-text">Belgenizi buraya sürükleyin</div>
-                        <div class="upload-subtext">veya tıklayarak seçin (JPG, PNG, PDF)</div>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
+                        <div id="uploadPrompt">
+                            <div class="upload-icon">📎</div>
+                            <div class="upload-text">CV'nizi buraya sürükleyin</div>
+                            <div class="upload-subtext">veya tıklayarak dosya seçin (PDF, PNG, JPG)</div>
+                        </div>
+                        <div id="previewContainer" class="preview-container" style="display: none;">
+                            <!-- Dynamically loaded preview -->
+                        </div>
                         <input type="file" id="fileInput" name="file" class="file-input" accept="image/*,.pdf" required>
+                    </div>
+
+                    <!-- OpenCV Settings -->
+                    <div class="opencv-settings">
+                        <h4 class="settings-title">⚙️ Görüntü Ön İşleme Ayarları (OpenCV)</h4>
+                        <div class="settings-group">
+                            <div class="form-group">
+                                <label for="binarizationMode" class="small-label">Eşikleme Yöntemi (Binarization):</label>
+                                <select id="binarizationMode" class="form-select">
+                                    <option value="otsu" selected>Otsu Thresholding (Varsayılan)</option>
+                                    <option value="adaptive">Adaptive Gaussian (Detaylı)</option>
+                                    <option value="none">Sadece Gri Tonlama (Filtresiz)</option>
+                                </select>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="autoDeskew" class="checkbox-input">
+                                <label for="autoDeskew" class="checkbox-label">Eğrilik Düzeltme (Auto-Deskew)</label>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button type="submit" id="processBtn" class="btn btn-primary">
-                            <span>🔍</span> Metni Çıkar
+                        <button type="submit" id="processBtn" class="btn btn-primary btn-full">
+                            <span>🔍</span> CV Analizi Yap
                         </button>
-                        <button type="button" class="btn btn-secondary" onclick="clearAll()">
+                        <button type="button" class="btn btn-secondary btn-full" onclick="clearAll()">
                             <span>🗑️</span> Temizle
                         </button>
                     </div>
                 </form>
+
+                <!-- SQLite History Panel -->
+                <div class="history-panel">
+                    <h4 class="settings-title border-top">📂 Son İşlenen Özgeçmişler</h4>
+                    <div id="historyList" class="history-list">
+                        <span class="no-data">Yüklenmiş özgeçmiş bulunamadı.</span>
+                    </div>
+                </div>
             </div>
 
+            <!-- Right Panel: Dynamic Results with tabs -->
             <div class="results-section">
                 <h2 class="section-title">
                     <span class="section-icon">📝</span>
-                    Çıkarılan Metin
+                    Analiz Sonuçları
                 </h2>
                 
                 <!-- Progress Bar -->
@@ -61,16 +318,200 @@
                 
                 <!-- Status Message -->
                 <div id="statusMessage" class="status-message"></div>
+
+                <!-- Tabs Navigation -->
+                <div class="results-tabs" id="resultsTabs" style="display: none;">
+                    <button type="button" class="tab-btn active" onclick="switchTab('textTab')">📄 Metin Çıktısı</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('cvTab')">🎓 CV Analizi</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('atsTab')">🏆 ATS Skor Kartı</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('roleTab')">🎯 Rol Uyum Analizörü</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('metadataTab')">📊 Akıllı Veri</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('webhookTab')">🔗 n8n / Webhook</button>
+                </div>
                 
-                <!-- Result Content Area -->
-                <div id="resultArea" class="result-placeholder">
-                    Henüz bir belge işlenmedi. Lütfen sol taraftan bir belge yükleyin.
+                <!-- Tab Contents -->
+                <div class="tab-contents">
+                    <!-- Tab 1: Text Output -->
+                    <div id="textTab" class="tab-pane active">
+                        <div id="resultArea" class="result-placeholder">
+                            Henüz bir özgeçmiş analiz edilmedi. Lütfen sol taraftan dosya yükleyin.
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: CV Analysis -->
+                    <div id="cvTab" class="tab-pane">
+                        <div class="metadata-container">
+                            <div class="metadata-group">
+                                <h4>🛠️ Belirlenen Teknik Beceriler (Skills)</h4>
+                                <div id="cvSkills" class="badge-list"><span class="no-data">Analiz edilmedi</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>🏫 Eğitim Bilgileri (Education)</h4>
+                                <div id="cvEducation" class="bullet-list">
+                                    <span class="no-data">Analiz edilmedi</span>
+                                </div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>💼 İş ve Deneyim İfadeleri (Experience)</h4>
+                                <div id="cvExperience" class="bullet-list">
+                                    <span class="no-data">Analiz edilmedi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: ATS Score Card -->
+                    <div id="atsTab" class="tab-pane">
+                        <div class="ats-container">
+                            <div class="ats-score-header">
+                                <div class="ats-circle-progress">
+                                    <svg viewBox="0 0 100 100" class="progress-ring">
+                                        <circle class="progress-ring-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle id="atsScoreRing" class="progress-ring-fill" cx="50" cy="50" r="40" style="stroke-dasharray: 251.2; stroke-dashoffset: 251.2;"></circle>
+                                    </svg>
+                                    <div class="ats-score-value">
+                                        <span id="atsScoreNum">0</span>
+                                        <span class="ats-score-label">ATS Puanı</span>
+                                    </div>
+                                </div>
+                                <div class="ats-score-summary">
+                                    <h3 id="atsScoreLevel">Hesaplanıyor...</h3>
+                                    <p id="atsScoreSummaryText">CV yapınızın puanlanması için lütfen sol taraftan bir belge analiz edin.</p>
+                                </div>
+                            </div>
+                            <div class="ats-breakdown">
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Okunabilirlik / Düzen</span>
+                                    <div class="breakdown-bar-container">
+                                        <div id="barReadability" class="breakdown-bar" style="width: 0%;"></div>
+                                    </div>
+                                    <span id="txtReadability" class="breakdown-val">0/100</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Kelime / Karakter Sayısı</span>
+                                    <div class="breakdown-bar-container">
+                                        <div id="barLength" class="breakdown-bar" style="width: 0%;"></div>
+                                    </div>
+                                    <span id="txtLength" class="breakdown-val">0/100</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Eylem Fiilleri Kullanımı</span>
+                                    <div class="breakdown-bar-container">
+                                        <div id="barVerbs" class="breakdown-bar" style="width: 0%;"></div>
+                                    </div>
+                                    <span id="txtVerbs" class="breakdown-val">0/100</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Metrikler ve Sonuçlar</span>
+                                    <div class="breakdown-bar-container">
+                                        <div id="barMetrics" class="breakdown-bar" style="width: 0%;"></div>
+                                    </div>
+                                    <span id="txtMetrics" class="breakdown-val">0/100</span>
+                                </div>
+                            </div>
+                            <div class="ats-tips">
+                                <h4>💡 ATS İyileştirme Tavsiyeleri</h4>
+                                <ul id="atsTipsList" class="ats-tips-list">
+                                    <li>Lütfen bir CV yükleyin ve analiz edin.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Job Role Matcher -->
+                    <div id="roleTab" class="tab-pane">
+                        <div class="role-matcher-container">
+                            <p class="role-desc">Özgeçmişinizin belirli bir kariyer pozisyonuyla olan uyumunu ve anahtar kelime eşleşmesini analiz edin.</p>
+                            <div class="form-group">
+                                <label for="targetRoleSelect">Hedef Pozisyon Seçin</label>
+                                <select id="targetRoleSelect" class="form-select" onchange="calculateRoleMatch()">
+                                    <option value="python_dev">Python Developer</option>
+                                    <option value="frontend_dev">Frontend Developer (React/UI)</option>
+                                    <option value="data_scientist">Data Scientist (AI/ML)</option>
+                                    <option value="product_manager">Product Manager</option>
+                                </select>
+                            </div>
+                            <div class="role-match-result">
+                                <div class="match-score-card">
+                                    <span class="match-score-title">Rol Uyum Yüzdesi</span>
+                                    <span id="roleMatchScore" class="match-score-value">0%</span>
+                                </div>
+                                <div class="match-details">
+                                    <h4 id="roleMatchStatus">Analiz Bekleniyor...</h4>
+                                    <p id="roleMatchFeedback">Öncelikle sol taraftan bir CV yükleyin veya geçmişten bir döküman seçin.</p>
+                                </div>
+                            </div>
+                            <div class="keyword-analysis">
+                                <div class="keyword-group">
+                                    <h4 class="green-text">✔ Tespit Edilen Anahtar Kelimeler</h4>
+                                    <div id="foundKeywords" class="badge-list">
+                                        <span class="no-data">Veri yok</span>
+                                    </div>
+                                </div>
+                                <div class="keyword-group">
+                                    <h4 class="red-text">⚠ Eksik Anahtar Kelimeler (Kritik)</h4>
+                                    <div id="missingKeywords" class="badge-list">
+                                        <span class="no-data">Veri yok</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Smart Metadata -->
+                    <div id="metadataTab" class="tab-pane">
+                        <div class="metadata-container">
+                            <div class="metadata-group">
+                                <h4>👤 Tespit Edilen Kişiler (NER)</h4>
+                                <div id="nerPersons" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>🏢 Tespit Edilen Kurumlar / Şirketler (NER)</h4>
+                                <div id="nerOrgs" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>📍 Tespit Edilen Lokasyonlar (NER)</h4>
+                                <div id="nerLocs" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>📧 E-posta Adresleri</h4>
+                                <div id="metaEmails" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>📞 Telefon Numaraları</h4>
+                                <div id="metaPhones" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>📅 Tarihler</h4>
+                                <div id="metaDates" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="metadata-group">
+                                <h4>🌐 Bağlantılar / Linkler</h4>
+                                <div id="metaUrls" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab 3: n8n/Webhook Integration -->
+                    <div id="webhookTab" class="tab-pane">
+                        <div class="webhook-container">
+                            <p class="webhook-desc">Elde edilen özgeçmiş verilerini otomatik olarak bir n8n kariyer senaryosuna veya özel bir webhook adresine gönderin.</p>
+                            <div class="form-group">
+                                <label for="webhookUrl">Webhook URL (n8n)</label>
+                                <input type="url" id="webhookUrl" placeholder="https://n8n.your-domain.com/g/webhook-id" value="http://localhost:5678/webhook-test/ocr-data">
+                            </div>
+                            <button type="button" class="btn btn-primary btn-webhook" onclick="sendToWebhook()">
+                                <span>🚀</span> Webhook'a Gönder
+                            </button>
+                            <div id="webhookStatus" class="webhook-status"></div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Action Buttons for Results -->
                 <div id="resultActions" class="action-buttons" style="display: none;">
                     <button type="button" class="btn btn-primary" onclick="copyText()">
-                        <span>📋</span> Kopyala
+                        <span>📋</span> Metni Kopyala
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="downloadText()">
                         <span>💾</span> İndir
@@ -78,32 +519,111 @@
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🚀</div>
-                <h3 class="feature-title">Hızlı İşleme</h3>
-                <p class="feature-description">Gelişmiş OCR teknolojisi ile belgelerinizi saniyeler içinde metne dönüştürün.</p>
+    <!-- Testimonials Section -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Kullanıcı Yorumları</h2>
+            <p class="section-subtitle">Sistemi kullanan iş arayanların ve insan kaynakları uzmanlarının deneyimleri.</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <p class="testimonial-quote">"Our hiring preparation improved dramatically thanks to AI Resume Analyzer."</p>
+                <div class="testimonial-author">- Sarah Jenkins, COO at FinTech Solutions</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <h3 class="feature-title">Yüksek Doğruluk</h3>
-                <p class="feature-description">Yapay zeka destekli algoritma ile %99.5 doğruluk oranında metin çıkarımı.</p>
+            <div class="testimonial-card">
+                <p class="testimonial-quote">"CV'mi buraya yükledikten sonra önerilen değişiklikleri yaptım ve 2 hafta içinde aradığım işten mülakat teklifi aldım!"</p>
+                <div class="testimonial-author">- Ahmet Yılmaz, Full Stack Developer</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3 class="feature-title">Güvenli İşleme</h3>
-                <p class="feature-description">Belgeleriniz güvenli bir şekilde işlenir ve hiçbir yerde saklanmaz.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3 class="feature-title">Çoklu Format</h3>
-                <p class="feature-description">JPG, PNG, PDF ve daha birçok dosya formatını destekler.</p>
+            <div class="testimonial-card">
+                <p class="testimonial-quote">"İşe alım öncesi aday özgeçmişlerini hızlıca tarayarak en yüksek puana sahip olanları ön plana çıkarmak işimizi çok kolaylaştırıyor."</p>
+                <div class="testimonial-author">- Maria Schmidt, HR Lead</div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Static JS Link -->
+    <!-- Pricing Section -->
+    <section id="pricing" class="section bg-light">
+        <div class="section-header">
+            <h2 class="section-title">Basit ve Şeffaf Fiyatlandırma</h2>
+            <p class="section-subtitle">İhtiyacınıza uygun, taahhütsüz paket seçenekleri.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h4 class="pricing-plan">Starter</h4>
+                <div class="pricing-price">$0 <span>/aylık</span></div>
+                <ul class="pricing-features">
+                    <li>Aylık 5 CV Analizi</li>
+                    <li>ATS Uyumluluk Kontrolü</li>
+                    <li>Yerel SQLite Geçmiş Desteği</li>
+                </ul>
+                <a href="#playground" class="btn btn-secondary btn-pricing">Ücretsiz Başla</a>
+            </div>
+            <div class="pricing-card premium-card">
+                <div class="pricing-badge">POPÜLER</div>
+                <h4 class="pricing-plan">Professional</h4>
+                <div class="pricing-price">$29 <span>/aylık</span></div>
+                <ul class="pricing-features">
+                    <li>Sınırsız Özgeçmiş Analizi</li>
+                    <li>Gelişmiş Skill Gap Analizi</li>
+                    <li>Kapsamlı Yapay Zeka Önerileri</li>
+                    <li>Sınırsız PDF Rapor İndirme</li>
+                </ul>
+                <a href="#playground" class="btn btn-primary btn-pricing">Satın Al</a>
+            </div>
+            <div class="pricing-card">
+                <h4 class="pricing-plan">Enterprise</h4>
+                <div class="pricing-price">$99 <span>/aylık</span></div>
+                <ul class="pricing-features">
+                    <li>Toplu CV Analiz Modülü</li>
+                    <li>Sınırsız n8n/Webhook Tetikleme</li>
+                    <li>7/24 Öncelikli Destek</li>
+                </ul>
+                <a href="#playground" class="btn btn-secondary btn-pricing">İletişime Geç</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta bg-gradient">
+        <h2 class="cta-title">Get Your Resume Interview-Ready</h2>
+        <p class="cta-subtitle">CV'nizi yapay zeka ile hemen analiz edin, eksiklerinizi kapatın ve mülakatlara güvenle katılın.</p>
+        <a href="#playground" class="btn btn-primary btn-cta">Start Free</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h4>AI Resume Analyzer</h4>
+                <p>SaaS Intelligent Resume Processing & ATS Grading Platform.</p>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-links-col">
+                    <h5>Özellikler</h5>
+                    <a href="#features">ATS Analizi</a>
+                    <a href="#pricing">Fiyatlandırma</a>
+                    <a href="#playground">Sandbox</a>
+                </div>
+                <div class="footer-links-col">
+                    <h5>Kaynaklar</h5>
+                    <a href="#">Dokümantasyon</a>
+                    <a href="#">API Blog</a>
+                </div>
+                <div class="footer-links-col">
+                    <h5>Bağlantılar</h5>
+                    <a href="https://github.com" target="_blank">GitHub</a>
+                    <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 AI Resume Analyzer. Tüm Hakları Saklıdır.</p>
+        </div>
+    </footer>
+
+    <!-- JS Link -->
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>

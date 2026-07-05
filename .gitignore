@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Local databases
+*.db
+documents.db
+
+# Uploaded files
+uploads/
+
+# OS/IDE files
+.DS_Store
+.vscode/
+.idea/
+
+# Nested git projects
+Erasmus-Staj-AI-Powered-CV-Analysis/

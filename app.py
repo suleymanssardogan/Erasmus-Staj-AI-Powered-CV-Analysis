@@ -8,4 +8,4 @@ from Proje.app import app
 
 if __name__ == '__main__':
     print("🚀 OCR Belge Okuma ve Otomasyon Sistemi başlatılıyor...")
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

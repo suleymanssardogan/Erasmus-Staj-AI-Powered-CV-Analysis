@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - AI Resume Analyzer</title>
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+    <div class="auth-split-screen">
+        <!-- Left Side: Form -->
+        <div class="auth-form-side">
+            <div class="auth-form-container">
+                <!-- Logo -->
+                <a href="{{ url_for('index') }}" class="auth-logo">
+                    <span class="logo-dot"></span>
+                    AI Resume Analyzer
+                </a>
+                
+                <div class="auth-header">
+                    <h1 class="auth-title">Tekrar hoş geldiniz</h1>
+                    <p class="auth-subtitle">Hesabınıza erişerek özgeçmişinizi analiz edin.</p>
+                </div>
+                
+                <!-- Google login button -->
+                <button type="button" class="btn-google" onclick="googleSignIn()">
+                    <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Google ile Giriş Yap
+                </button>
+                
+                <div class="auth-separator">
+                    <span>veya e-posta ile</span>
+                </div>
+                
+                <!-- Native login form -->
+                <form class="auth-form" onsubmit="event.preventDefault(); window.location.href='/';">
+                    <div class="form-group">
+                        <label for="email">E-posta Adresi</label>
+                        <input type="email" id="email" placeholder="adiniz@firma.com" required autocomplete="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Şifre</label>
+                        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    
+                    <div class="form-actions-row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="rememberMe" class="checkbox-input">
+                            <label for="rememberMe" class="checkbox-label">Beni Hatırla</label>
+                        </div>
+                        <a href="#" class="auth-link">Şifremi Unuttum</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full" style="padding: 12px 24px;">Giriş Yap</button>
+                </form>
+                
+                <p class="auth-footer">
+                    Hesabınız yok mu? <a href="{{ url_for('register') }}" class="auth-link">Ücretsiz Kaydolun</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Right Side: Graphic/Illustration -->
+        <div class="auth-illustration-side">
+            <div class="illustration-content">
+                <div class="illustration-glass-card">
+                    <div class="glass-header">
+                        <span class="window-dot red"></span>
+                        <span class="window-dot yellow"></span>
+                        <span class="window-dot green"></span>
+                    </div>
+                    <h3 class="glass-title">Gelişmiş ATS Uyum Algoritması</h3>
+                    <p class="glass-text">Resume Analyzer, dökümanınızı taranırken 128 farklı filtreye göre analiz ederek İK tarayıcılarından geçmesini garanti altına alır.</p>
+                    <div class="glass-badge-row">
+                        <span class="glass-badge">ATS Optimize</span>
+                        <span class="glass-badge">AI Grading</span>
+                        <span class="glass-badge">PDF Export</span>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!-- JS Link -->
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
