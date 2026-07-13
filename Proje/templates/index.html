@@ -3,25 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Resume Analyzer - SaaS Özgeçmiş & ATS Analiz Platformu</title>
+    <title>AI CV Analyzer & OCR Pipeline</title>
     <!-- CSS Link -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Sharper Corners (Keskin Kenarlar) */
+            --radius-sm: 2px !important;
+            --radius-md: 4px !important;
+            --radius-lg: 4px !important;
+            --radius-xl: 4px !important;
+            
+            /* Modern / Simple Accents (Sade ve Keskin Renkler) */
+            --accent-purple: #09090b !important;
+            --accent-blue: #2563eb !important;
+            --accent-purple-light: #f4f4f5 !important;
+            --accent-blue-light: rgba(37, 99, 235, 0.05) !important;
+            --accent-gradient: linear-gradient(180deg, #09090b 0%, #27272a 100%) !important;
+            
+            /* Light mode overrides */
+            --bg-primary: #ffffff !important;
+            --bg-secondary: #fafafa !important;
+            --bg-tertiary: #f4f4f5 !important;
+            --text-primary: #09090b !important;
+            --text-secondary: #71717a !important;
+            --border-color: #e4e4e7 !important;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+            --shadow-lg: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+            --shadow-xl: 0 2px 4px 0 rgba(0, 0, 0, 0.02) !important;
+        }
+
+        body.dark-mode {
+            /* Dark mode overrides (Shadcn style) */
+            --bg-primary: #09090b !important;
+            --bg-secondary: #09090b !important;
+            --bg-tertiary: #18181b !important;
+            --text-primary: #f4f4f5 !important;
+            --text-secondary: #a1a1aa !important;
+            --border-color: #27272a !important;
+            
+            --accent-purple: #fafafa !important;
+            --accent-blue: #3b82f6 !important;
+            --accent-purple-light: #18181b !important;
+            --accent-blue-light: rgba(59, 130, 246, 0.1) !important;
+            --accent-gradient: linear-gradient(180deg, #ffffff 0%, #e4e4e7 100%) !important;
+        }
+
+        /* Workspace Grid Adjustments */
+        .workspace-container {
+            max-width: 1280px;
+            margin: 85px auto 30px auto;
+            padding: 0 24px;
+        }
+        .workspace-header {
+            text-align: left; /* Modern left-aligned layout */
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .workspace-title {
+            font-family: var(--font-heading);
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary) !important;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+            letter-spacing: -0.5px;
+        }
+        .workspace-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 900px;
+            margin: 0;
+            line-height: 1.5;
+        }
+        .main-content {
+            margin-top: 0 !important;
+            padding: 0 !important;
+            grid-template-columns: 9fr 13fr !important; /* Slightly larger results pane */
+            gap: 24px !important;
+        }
+
+        /* Modern Crisp Wireframe Card styling */
+        .upload-section, .results-section {
+            padding: 24px !important;
+            box-shadow: var(--shadow-sm) !important;
+            border: 1px solid var(--border-color) !important;
+            background: var(--bg-primary) !important;
+        }
+        
+        .section-title {
+            font-size: 1.15rem !important;
+            font-weight: 600 !important;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px !important;
+        }
+
+        .upload-area {
+            border: 1px dashed var(--border-color) !important;
+            padding: 30px 20px !important;
+            background: var(--bg-secondary) !important;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--text-primary) !important;
+            background: var(--bg-tertiary) !important;
+        }
+
+        .upload-icon {
+            font-size: 2rem !important;
+            margin-bottom: 8px !important;
+        }
+
+        .upload-text {
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+        }
+
+        .upload-subtext {
+            font-size: 0.8rem !important;
+        }
+
+        /* Settings and forms */
+        .opencv-settings {
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 16px !important;
+            margin-top: 20px !important;
+        }
+
+        .settings-title {
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px !important;
+            color: var(--text-primary) !important;
+        }
+
+        .form-select {
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-color) !important;
+            font-size: 0.85rem !important;
+            padding: 8px 12px !important;
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .form-select:focus {
+            border-color: var(--text-primary) !important;
+        }
+
+        /* Tab Menu (Shadcn style - Underline style) */
+        .results-tabs {
+            border-bottom: 1px solid var(--border-color) !important;
+            gap: 0 !important;
+            margin-bottom: 20px !important;
+            padding: 0 !important;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            border-radius: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 2px solid transparent !important;
+            padding: 10px 16px !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+            color: var(--text-secondary) !important;
+            transition: all 0.15s ease !important;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary) !important;
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid var(--text-primary) !important;
+            color: var(--text-primary) !important;
+            font-weight: 600 !important;
+        }
+
+        /* Buttons (Sharp & Clean) */
+        .btn {
+            border-radius: var(--radius-md) !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+            padding: 8px 16px !important;
+            box-shadow: none !important;
+            transform: none !important;
+            border: 1px solid var(--border-color) !important;
+        }
+
+        .btn:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-primary {
+            background: var(--text-primary) !important;
+            color: var(--bg-primary) !important;
+            border-color: var(--text-primary) !important;
+        }
+
+        .btn-primary:hover {
+            background: var(--text-secondary) !important;
+            border-color: var(--text-secondary) !important;
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary) !important;
+        }
+        
+        .btn-nav {
+            background: var(--text-primary) !important;
+            color: var(--bg-primary) !important;
+            border-color: var(--text-primary) !important;
+        }
+
+        /* Results Pane and Textareas */
+        .result-content, .result-placeholder {
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-color) !important;
+            background: var(--bg-secondary) !important;
+            font-family: 'Courier Prime', monospace !important;
+            font-size: 0.85rem !important;
+            padding: 16px !important;
+            color: var(--text-primary) !important;
+            line-height: 1.5 !important;
+            min-height: 380px !important;
+        }
+
+        /* History lists */
+        .history-list {
+            gap: 8px !important;
+            margin-top: 12px !important;
+        }
+
+        .history-item {
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 10px 14px !important;
+            background: var(--bg-secondary) !important;
+            font-size: 0.85rem !important;
+            transition: all 0.15s ease;
+        }
+
+        .history-item:hover {
+            border-color: var(--text-primary) !important;
+            background: var(--bg-tertiary) !important;
+        }
+
+        /* Badges & Pills */
+        .meta-badge, .badge-list span {
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-color) !important;
+            font-size: 0.75rem !important;
+            padding: 4px 8px !important;
+            background: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+            font-weight: 500 !important;
+        }
+
+        /* ATS score circle */
+        .ats-circle-progress {
+            width: 90px !important;
+            height: 90px !important;
+        }
+        
+        .ats-score-value {
+            font-size: 1.25rem !important;
+        }
+        
+        .ats-score-num {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+        }
+
+        .ats-breakdown {
+            gap: 12px !important;
+        }
+
+        .breakdown-bar-container {
+            height: 6px !important;
+            border-radius: var(--radius-sm) !important;
+            background: var(--border-color) !important;
+        }
+
+        .breakdown-bar {
+            height: 6px !important;
+            border-radius: var(--radius-sm) !important;
+        }
+
+        /* Scrollbar styles to match the sharp design */
+        ::-webkit-scrollbar-thumb {
+            border-radius: var(--radius-sm) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="nav-logo">
+            <a href="/" class="nav-logo">
                 <span class="logo-dot"></span>
-                AI Resume Analyzer
+                AI CV Analyzer & OCR Pipeline
             </a>
-            <div class="nav-links">
-                <a href="#features">Özellikler</a>
-                <a href="#how-it-works">Nasıl Çalışır</a>
-                <a href="#pricing">Fiyatlandırma</a>
-            </div>
             <div class="nav-actions">
                 <button id="themeToggle" class="theme-btn" aria-label="Tema Değiştir">
                     <span class="icon-light">☀️</span>
@@ -29,7 +331,7 @@
                 </button>
                 <div id="navAuthButtons" class="nav-auth-buttons">
                     <a href="{{ url_for('login') }}" class="btn btn-secondary">Giriş Yap</a>
-                    <a href="{{ url_for('register') }}" class="btn btn-nav">Başlayın</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-nav">Kayıt Ol</a>
                 </div>
                 <div id="navUserProfile" class="nav-user-profile" style="display: none;">
                     <img id="userAvatar" src="" alt="Profil" class="user-avatar-img">
@@ -40,212 +342,14 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="badge-new">✨ AI-Powered Career Assistant</div>
-                <h1 class="hero-title">
-                    Analyze Your <span class="gradient-text">Resume</span> with AI
-                </h1>
-                <p class="hero-subtitle">
-                    Upload your CV and receive an AI-powered analysis in seconds. The system evaluates ATS Compatibility, Missing Skills, Resume Score, Strengths & Weaknesses, and professional recommendations.
-                </p>
-                <div class="hero-ctas">
-                    <a href="#playground" class="btn btn-primary btn-hero">Analyze Resume</a>
-                    <a href="#demo" class="btn btn-secondary btn-hero">View Demo</a>
-                </div>
-            </div>
-            
-            <!-- Dashboard Mockup on Hero Right -->
-            <div class="hero-mockup">
-                <div class="mockup-frame">
-                    <div class="mockup-header">
-                        <span class="window-dot red"></span>
-                        <span class="window-dot yellow"></span>
-                        <span class="window-dot green"></span>
-                        <span class="mockup-title">AI Resume Analyzer Dashboard</span>
-                    </div>
-                    <div class="mockup-body">
-                        <div class="mockup-sidebar">
-                            <div class="sidebar-item active">📁 resume_dev_2026.pdf</div>
-                            <div class="sidebar-item">📄 cv_designer.png</div>
-                            <div class="sidebar-item">⚙️ Settings</div>
-                        </div>
-                        <div class="mockup-main">
-                            <div class="mockup-flex" style="justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div class="mockup-label">File Size</div>
-                                    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: #27c93f;">242 KB</h3>
-                                </div>
-                                <div>
-                                    <div class="mockup-label">Document Type</div>
-                                    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--accent-purple);">PDF Format</h3>
-                                </div>
-                            </div>
-                            <div class="mockup-section">
-                                <div class="mockup-label">Missing Skills</div>
-                                <div class="mockup-flex">
-                                    <div class="mockup-badge" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56;">TypeScript</div>
-                                    <div class="mockup-badge" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56;">AWS</div>
-                                    <div class="mockup-badge" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56;">Docker</div>
-                                </div>
-                            </div>
-                            <div class="mockup-section">
-                                <div class="mockup-label">AI Suggestions</div>
-                                <p class="mockup-text">• Add quantitative metrics to your experience section.<br>• Expand your project descriptions with technical stack details.</p>
-                            </div>
-                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem; border-radius: 8px; width: 100%;" onclick="document.getElementById('playground').scrollIntoView();">Download PDF Report</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Main Workspace -->
+    <main class="workspace-container">
+        <header class="workspace-header">
+            <h1 class="workspace-title">Akıllı CV Analiz & OCR Otomasyon Sistemi</h1>
+            <p class="workspace-subtitle">Özgeçmişinizi (PDF, PNG, JPG) yükleyin; OCR metin okuma, yapay zeka analizleri, ATS skorlaması ve n8n entegrasyonuyla anında değerlendirin.</p>
+        </header>
 
-    <!-- Features Section -->
-    <section id="features" class="section">
-        <div class="section-header">
-            <h2 class="section-title">Neden AI Resume Analyzer?</h2>
-            <p class="section-subtitle">Gelişmiş AI özellikleri ile kariyerinizi bir üst seviyeye taşıyın.</p>
-        </div>
-        <div class="features-grid">
-            <div class="saas-card">
-                <div class="saas-card-icon">🧠</div>
-                <h3 class="saas-card-title">AI Resume Analysis</h3>
-                <p class="saas-card-desc">Understand strengths, weaknesses and overall resume quality through advanced semantic intelligence.</p>
-            </div>
-            <div class="saas-card">
-                <div class="saas-card-icon">📊</div>
-                <h3 class="saas-card-title">ATS Compatibility</h3>
-                <p class="saas-card-desc">Check whether your resume can pass Applicant Tracking Systems (ATS) and avoid screening filters.</p>
-            </div>
-            <div class="saas-card">
-                <div class="saas-card-icon">🔍</div>
-                <h3 class="saas-card-title">Skill Gap Detection</h3>
-                <p class="saas-card-desc">Identify missing technical and soft skills based on target positions and market demands.</p>
-            </div>
-            <div class="saas-card">
-                <div class="saas-card-icon">💡</div>
-                <h3 class="saas-card-title">AI Recommendations</h3>
-                <p class="saas-card-desc">Receive actionable and domain-specific suggestions to instantly improve your resume structure and wording.</p>
-            </div>
-            <div class="saas-card">
-                <div class="saas-card-icon">🏆</div>
-                <h3 class="saas-card-title">Resume Scoring</h3>
-                <p class="saas-card-desc">Generate an overall resume score with detailed feedback comparing you to similar industry peers.</p>
-            </div>
-            <div class="saas-card">
-                <div class="saas-card-icon">💾</div>
-                <h3 class="saas-card-title">Download Report</h3>
-                <p class="saas-card-desc">Export a professional PDF report containing direct AI insights, suggestions, and ATS evaluation notes.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="section bg-light">
-        <div class="section-header">
-            <h2 class="section-title">Nasıl Çalışır?</h2>
-            <p class="section-subtitle">Sadece 4 kolay adımda özgeçmişinizi mülakata hazır hale getirin.</p>
-        </div>
-        <div class="timeline-container">
-            <div class="timeline-step">
-                <div class="step-num">1</div>
-                <div class="step-icon">👤</div>
-                <h4 class="step-title">Hesap Oluştur</h4>
-                <p class="step-desc">Hızlıca kayıt olun ve analiz panelinize anında erişin.</p>
-            </div>
-            <div class="timeline-arrow">➔</div>
-            <div class="timeline-step">
-                <div class="step-num">2</div>
-                <div class="step-icon">📤</div>
-                <h4 class="step-title">CV Yükle</h4>
-                <p class="step-desc">PDF veya görsel formatındaki özgeçmişinizi sürükleyip bırakın.</p>
-            </div>
-            <div class="timeline-arrow">➔</div>
-            <div class="timeline-step">
-                <div class="step-num">3</div>
-                <div class="step-icon">🤖</div>
-                <h4 class="step-title">AI Analizi</h4>
-                <p class="step-desc">Yapay zeka CV içeriğini ATS ve beceri uyumuna göre analiz etsin.</p>
-            </div>
-            <div class="timeline-arrow">➔</div>
-            <div class="timeline-step">
-                <div class="step-num">4</div>
-                <div class="step-icon">📄</div>
-                <h4 class="step-title">Raporu Al</h4>
-                <p class="step-desc">Tüm zayıf yönleri, puanları ve beceri eksikliklerini rapor halinde alın.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard Preview -->
-    <section id="demo" class="section">
-        <div class="section-header">
-            <h2 class="section-title">Kariyer Panel Önizlemesi</h2>
-            <p class="section-subtitle">Döküman analizi ve profesyonel kariyer panelinin tasarımı.</p>
-        </div>
-        
-        <div class="saas-dashboard-preview">
-            <!-- Sidebar -->
-            <div class="dash-sidebar">
-                <div class="dash-logo">📁 Resume Analyzer</div>
-                <div class="dash-nav-group">
-                    <div class="dash-nav-item active">📊 Dashboard</div>
-                    <div class="dash-nav-item">📤 Upload Resume</div>
-                    <div class="dash-nav-item">📂 Analysis History</div>
-                    <div class="dash-nav-item">📄 Reports</div>
-                    <div class="dash-nav-item">👤 Profile</div>
-                    <div class="dash-nav-item">⚙️ Settings</div>
-                </div>
-            </div>
-            <!-- Main dashboard panel -->
-            <div class="dash-main">
-                <div class="dash-main-header">
-                    <div class="dash-title">Önizleme: <b>resume_software_engineer.pdf</b></div>
-                    <div class="dash-flex" style="display:flex; gap:10px;">
-                        <div class="dash-score" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border-color: rgba(37,99,235,0.2);">Tür: <b>CV (Özgeçmiş)</b></div>
-                        <div class="dash-score" style="background: rgba(39, 201, 63, 0.1); color: #27c93f; border-color: rgba(39,201,63,0.2);">Durum: <b>Analiz Edildi</b></div>
-                    </div>
-                </div>
-                <div class="dash-grid">
-                    <div class="dash-panel-card col-8" style="font-size: 0.85rem;">
-                        <div class="dash-panel-label" style="display:flex; justify-content:space-between;">
-                            <span>Güçlü Yönler</span>
-                            <span style="color: #27c93f;">✔ Çok Güçlü</span>
-                        </div>
-                        <p class="dash-panel-text" style="margin-bottom: 15px;">• Python, Javascript ve SQL gibi aranan teknik dillerde tam yetkinlik.<br>• Proje geliştirme ve staj tecrübelerinin dökümünde kullanılan aktif dil seviyesi oldukça yüksek.</p>
-                        
-                        <div class="dash-panel-label" style="display:flex; justify-content:space-between; border-top: 1px solid #27272a; padding-top: 15px;">
-                            <span>Zayıf Yönler</span>
-                            <span style="color: #ff5f56;">⚠ İyileştirilmeli</span>
-                        </div>
-                        <p class="dash-panel-text">• Deneyimlerde yapılan işlerin ölçülebilir iş sonuçları (KPI/Metrikler) belirtilmemiş.<br>• İletişim yeteneği ve sunum gibi sosyal becerilere yeterince yer verilmemiş.</p>
-                    </div>
-                    <div class="dash-panel-card col-4">
-                        <div class="dash-panel-label">Eksik Beceriler (Skill Gap)</div>
-                        <div class="dash-meta-badge-flex" style="margin-bottom: 15px;">
-                            <span class="meta-badge badge-url" style="background:rgba(255,95,86,0.1); color:#ff5f56; border-color:rgba(255,95,86,0.2);">Docker</span>
-                            <span class="meta-badge badge-url" style="background:rgba(255,95,86,0.1); color:#ff5f56; border-color:rgba(255,95,86,0.2);">AWS</span>
-                            <span class="meta-badge badge-url" style="background:rgba(255,95,86,0.1); color:#ff5f56; border-color:rgba(255,95,86,0.2);">TypeScript</span>
-                        </div>
-                        <div class="dash-panel-label">Yapay Zeka Önerileri</div>
-                        <p class="dash-panel-text" style="font-size: 0.8rem; line-height: 1.4;">Özgeçmişinizi ATS tarayıcılarına uygun hale getirmek için başlık fontlarını standartlaştırın ve en çok aranan Docker/AWS yeteneklerinizi projelerinize dahil edin.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- LIVE APP DASHBOARD (PLAYGROUND) -->
-    <section id="playground" class="section bg-light border-y">
-        <div class="section-header">
-            <h2 class="section-title">Canlı CV Analiz Arayüzü</h2>
-            <p class="section-subtitle">PDF formatındaki CV'nizi yükleyerek sistemi canlı olarak test edebilirsiniz.</p>
-        </div>
-
-        <div class="main-content container">
+        <div class="main-content">
             <!-- Left Panel: File Input, OpenCV settings, SQLite History -->
             <div class="upload-section">
                 <h2 class="section-title">
@@ -519,107 +623,12 @@
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="section">
-        <div class="section-header">
-            <h2 class="section-title">Kullanıcı Yorumları</h2>
-            <p class="section-subtitle">Sistemi kullanan iş arayanların ve insan kaynakları uzmanlarının deneyimleri.</p>
-        </div>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <p class="testimonial-quote">"Our hiring preparation improved dramatically thanks to AI Resume Analyzer."</p>
-                <div class="testimonial-author">- Sarah Jenkins, COO at FinTech Solutions</div>
-            </div>
-            <div class="testimonial-card">
-                <p class="testimonial-quote">"CV'mi buraya yükledikten sonra önerilen değişiklikleri yaptım ve 2 hafta içinde aradığım işten mülakat teklifi aldım!"</p>
-                <div class="testimonial-author">- Ahmet Yılmaz, Full Stack Developer</div>
-            </div>
-            <div class="testimonial-card">
-                <p class="testimonial-quote">"İşe alım öncesi aday özgeçmişlerini hızlıca tarayarak en yüksek puana sahip olanları ön plana çıkarmak işimizi çok kolaylaştırıyor."</p>
-                <div class="testimonial-author">- Maria Schmidt, HR Lead</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing" class="section bg-light">
-        <div class="section-header">
-            <h2 class="section-title">Basit ve Şeffaf Fiyatlandırma</h2>
-            <p class="section-subtitle">İhtiyacınıza uygun, taahhütsüz paket seçenekleri.</p>
-        </div>
-        <div class="pricing-grid">
-            <div class="pricing-card">
-                <h4 class="pricing-plan">Starter</h4>
-                <div class="pricing-price">$0 <span>/aylık</span></div>
-                <ul class="pricing-features">
-                    <li>Aylık 5 CV Analizi</li>
-                    <li>ATS Uyumluluk Kontrolü</li>
-                    <li>Yerel SQLite Geçmiş Desteği</li>
-                </ul>
-                <a href="#playground" class="btn btn-secondary btn-pricing">Ücretsiz Başla</a>
-            </div>
-            <div class="pricing-card premium-card">
-                <div class="pricing-badge">POPÜLER</div>
-                <h4 class="pricing-plan">Professional</h4>
-                <div class="pricing-price">$29 <span>/aylık</span></div>
-                <ul class="pricing-features">
-                    <li>Sınırsız Özgeçmiş Analizi</li>
-                    <li>Gelişmiş Skill Gap Analizi</li>
-                    <li>Kapsamlı Yapay Zeka Önerileri</li>
-                    <li>Sınırsız PDF Rapor İndirme</li>
-                </ul>
-                <a href="#playground" class="btn btn-primary btn-pricing">Satın Al</a>
-            </div>
-            <div class="pricing-card">
-                <h4 class="pricing-plan">Enterprise</h4>
-                <div class="pricing-price">$99 <span>/aylık</span></div>
-                <ul class="pricing-features">
-                    <li>Toplu CV Analiz Modülü</li>
-                    <li>Sınırsız n8n/Webhook Tetikleme</li>
-                    <li>7/24 Öncelikli Destek</li>
-                </ul>
-                <a href="#playground" class="btn btn-secondary btn-pricing">İletişime Geç</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA Section -->
-    <section class="final-cta bg-gradient">
-        <h2 class="cta-title">Get Your Resume Interview-Ready</h2>
-        <p class="cta-subtitle">CV'nizi yapay zeka ile hemen analiz edin, eksiklerinizi kapatın ve mülakatlara güvenle katılın.</p>
-        <a href="#playground" class="btn btn-primary btn-cta">Start Free</a>
-    </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <h4>AI Resume Analyzer</h4>
-                <p>SaaS Intelligent Resume Processing & ATS Grading Platform.</p>
-            </div>
-            <div class="footer-links-group">
-                <div class="footer-links-col">
-                    <h5>Özellikler</h5>
-                    <a href="#features">ATS Analizi</a>
-                    <a href="#pricing">Fiyatlandırma</a>
-                    <a href="#playground">Sandbox</a>
-                </div>
-                <div class="footer-links-col">
-                    <h5>Kaynaklar</h5>
-                    <a href="#">Dokümantasyon</a>
-                    <a href="#">API Blog</a>
-                </div>
-                <div class="footer-links-col">
-                    <h5>Bağlantılar</h5>
-                    <a href="https://github.com" target="_blank">GitHub</a>
-                    <a href="https://linkedin.com" target="_blank">LinkedIn</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 AI Resume Analyzer. Tüm Hakları Saklıdır.</p>
+        <div class="footer-container" style="justify-content: center; padding: 20px 24px;">
+            <p>&copy; 2026 AI CV Analyzer & OCR Pipeline. Tüm Hakları Saklıdır.</p>
         </div>
     </footer>
 

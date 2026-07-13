@@ -25,6 +25,10 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 init_db()
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# TESSDATA_PREFIX ortam değişkenini proje düzeyindeki yerel klasörü kullanacak şekilde ayarla
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.environ["TESSDATA_PREFIX"] = os.path.join(root_dir, "tessdata")
+
 # Tesseract yolunu macOS ve Linux için yapılandır
 tesseract_paths = [
     "/usr/bin/tesseract",
