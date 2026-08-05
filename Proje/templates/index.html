@@ -10,27 +10,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Sharper Corners (Keskin Kenarlar) */
             --radius-sm: 2px !important;
             --radius-md: 4px !important;
             --radius-lg: 4px !important;
             --radius-xl: 4px !important;
-            
-            /* Modern / Simple Accents (Sade ve Keskin Renkler) */
+
             --accent-purple: #09090b !important;
             --accent-blue: #2563eb !important;
             --accent-purple-light: #f4f4f5 !important;
             --accent-blue-light: rgba(37, 99, 235, 0.05) !important;
             --accent-gradient: linear-gradient(180deg, #09090b 0%, #27272a 100%) !important;
-            
-            /* Light mode overrides */
+
             --bg-primary: #ffffff !important;
             --bg-secondary: #fafafa !important;
             --bg-tertiary: #f4f4f5 !important;
             --text-primary: #09090b !important;
             --text-secondary: #71717a !important;
             --border-color: #e4e4e7 !important;
-            
+
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
             --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
             --shadow-lg: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
@@ -38,14 +35,13 @@
         }
 
         body.dark-mode {
-            /* Dark mode overrides (Shadcn style) */
             --bg-primary: #09090b !important;
             --bg-secondary: #09090b !important;
             --bg-tertiary: #18181b !important;
             --text-primary: #f4f4f5 !important;
             --text-secondary: #a1a1aa !important;
             --border-color: #27272a !important;
-            
+
             --accent-purple: #fafafa !important;
             --accent-blue: #3b82f6 !important;
             --accent-purple-light: #18181b !important;
@@ -53,21 +49,21 @@
             --accent-gradient: linear-gradient(180deg, #ffffff 0%, #e4e4e7 100%) !important;
         }
 
-        /* Workspace Grid Adjustments */
+        /* Single-column flow layout */
         .workspace-container {
-            max-width: 1280px;
+            max-width: 760px;
             margin: 85px auto 30px auto;
             padding: 0 24px;
         }
         .workspace-header {
-            text-align: left; /* Modern left-aligned layout */
-            margin-bottom: 30px;
+            text-align: left;
+            margin-bottom: 28px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
         }
         .workspace-title {
             font-family: var(--font-heading);
-            font-size: 1.85rem;
+            font-size: 1.7rem;
             font-weight: 700;
             margin-bottom: 6px;
             color: var(--text-primary) !important;
@@ -77,75 +73,67 @@
         }
         .workspace-subtitle {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            max-width: 900px;
+            font-size: 0.92rem;
+            max-width: 640px;
             margin: 0;
             line-height: 1.5;
         }
-        .main-content {
-            margin-top: 0 !important;
-            padding: 0 !important;
-            grid-template-columns: 9fr 13fr !important; /* Slightly larger results pane */
-            gap: 24px !important;
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        /* Modern Crisp Wireframe Card styling */
-        .upload-section, .results-section {
-            padding: 24px !important;
+        .flow-card {
+            padding: 22px !important;
             box-shadow: var(--shadow-sm) !important;
             border: 1px solid var(--border-color) !important;
             background: var(--bg-primary) !important;
         }
-        
+
         .section-title {
-            font-size: 1.15rem !important;
+            font-size: 1.05rem !important;
             font-weight: 600 !important;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 12px;
-            margin-bottom: 20px !important;
+            margin-bottom: 18px !important;
         }
 
         .upload-area {
             border: 1px dashed var(--border-color) !important;
-            padding: 30px 20px !important;
+            padding: 26px 20px !important;
             background: var(--bg-secondary) !important;
         }
-        
         .upload-area:hover {
             border-color: var(--text-primary) !important;
             background: var(--bg-tertiary) !important;
         }
+        .upload-icon { font-size: 1.8rem !important; margin-bottom: 8px !important; }
+        .upload-text { font-size: 0.95rem !important; font-weight: 500 !important; }
+        .upload-subtext { font-size: 0.8rem !important; }
 
-        .upload-icon {
-            font-size: 2rem !important;
-            margin-bottom: 8px !important;
+        .advanced-settings {
+            margin-top: 16px !important;
         }
-
-        .upload-text {
-            font-size: 0.95rem !important;
-            font-weight: 500 !important;
+        .advanced-settings summary {
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            list-style: none;
         }
+        .advanced-settings summary::-webkit-details-marker { display: none; }
+        .advanced-settings summary::before { content: "⚙️ "; }
+        .advanced-settings[open] summary { color: var(--text-primary); }
 
-        .upload-subtext {
-            font-size: 0.8rem !important;
-        }
-
-        /* Settings and forms */
         .opencv-settings {
             background: var(--bg-secondary) !important;
             border: 1px solid var(--border-color) !important;
             border-radius: var(--radius-md) !important;
             padding: 16px !important;
-            margin-top: 20px !important;
-        }
-
-        .settings-title {
-            font-size: 0.85rem !important;
-            font-weight: 600 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px !important;
-            color: var(--text-primary) !important;
+            margin-top: 8px !important;
         }
 
         .form-select {
@@ -156,45 +144,24 @@
             background-color: var(--bg-primary) !important;
             color: var(--text-primary) !important;
         }
+        .form-select:focus { border-color: var(--text-primary) !important; }
 
-        .form-select:focus {
-            border-color: var(--text-primary) !important;
+        .history-toggle {
+            margin-top: 16px !important;
         }
-
-        /* Tab Menu (Shadcn style - Underline style) */
-        .results-tabs {
-            border-bottom: 1px solid var(--border-color) !important;
-            gap: 0 !important;
-            margin-bottom: 20px !important;
-            padding: 0 !important;
-            display: flex;
-            overflow-x: auto;
+        .history-toggle summary {
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-top: 1px dashed var(--border-color);
+            list-style: none;
         }
+        .history-toggle summary::-webkit-details-marker { display: none; }
+        .history-toggle summary::before { content: "📂 "; }
 
-        .tab-btn {
-            border-radius: 0 !important;
-            background: transparent !important;
-            border: none !important;
-            border-bottom: 2px solid transparent !important;
-            padding: 10px 16px !important;
-            font-size: 0.85rem !important;
-            font-weight: 500 !important;
-            color: var(--text-secondary) !important;
-            transition: all 0.15s ease !important;
-            white-space: nowrap;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary) !important;
-        }
-
-        .tab-btn.active {
-            border-bottom: 2px solid var(--text-primary) !important;
-            color: var(--text-primary) !important;
-            font-weight: 600 !important;
-        }
-
-        /* Buttons (Sharp & Clean) */
+        /* Buttons */
         .btn {
             border-radius: var(--radius-md) !important;
             font-size: 0.85rem !important;
@@ -204,39 +171,29 @@
             transform: none !important;
             border: 1px solid var(--border-color) !important;
         }
-
-        .btn:hover {
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
+        .btn:hover { transform: none !important; box-shadow: none !important; }
         .btn-primary {
             background: var(--text-primary) !important;
             color: var(--bg-primary) !important;
             border-color: var(--text-primary) !important;
         }
+        .btn-primary:hover { background: var(--text-secondary) !important; border-color: var(--text-secondary) !important; }
+        .btn-secondary { background: var(--bg-primary) !important; color: var(--text-primary) !important; }
+        .btn-secondary:hover { background: var(--bg-tertiary) !important; }
+        .btn-nav { background: var(--text-primary) !important; color: var(--bg-primary) !important; border-color: var(--text-primary) !important; }
 
-        .btn-primary:hover {
-            background: var(--text-secondary) !important;
-            border-color: var(--text-secondary) !important;
+        /* Extracted text block (collapsible to keep the flow short) */
+        .text-result-toggle summary {
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 4px 0 12px 0;
+            list-style: none;
         }
+        .text-result-toggle summary::-webkit-details-marker { display: none; }
+        .text-result-toggle summary::before { content: "▸ "; }
+        .text-result-toggle[open] summary::before { content: "▾ "; }
 
-        .btn-secondary {
-            background: var(--bg-primary) !important;
-            color: var(--text-primary) !important;
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-tertiary) !important;
-        }
-        
-        .btn-nav {
-            background: var(--text-primary) !important;
-            color: var(--bg-primary) !important;
-            border-color: var(--text-primary) !important;
-        }
-
-        /* Results Pane and Textareas */
         .result-content, .result-placeholder {
             border-radius: var(--radius-md) !important;
             border: 1px solid var(--border-color) !important;
@@ -246,15 +203,12 @@
             padding: 16px !important;
             color: var(--text-primary) !important;
             line-height: 1.5 !important;
-            min-height: 380px !important;
+            max-height: 320px !important;
         }
+        .result-placeholder { min-height: 90px !important; max-height: none !important; }
 
         /* History lists */
-        .history-list {
-            gap: 8px !important;
-            margin-top: 12px !important;
-        }
-
+        .history-list { gap: 8px !important; margin-top: 10px !important; }
         .history-item {
             border: 1px solid var(--border-color) !important;
             border-radius: var(--radius-md) !important;
@@ -263,11 +217,9 @@
             font-size: 0.85rem !important;
             transition: all 0.15s ease;
         }
+        .history-item:hover { border-color: var(--text-primary) !important; background: var(--bg-tertiary) !important; }
 
-        .history-item:hover {
-            border-color: var(--text-primary) !important;
-            background: var(--bg-tertiary) !important;
-        }
+        .metadata-group .badge-list + .badge-list { margin-top: 8px; }
 
         /* Badges & Pills */
         .meta-badge, .badge-list span {
@@ -281,39 +233,27 @@
         }
 
         /* ATS score circle */
-        .ats-circle-progress {
-            width: 90px !important;
-            height: 90px !important;
-        }
-        
-        .ats-score-value {
-            font-size: 1.25rem !important;
-        }
-        
-        .ats-score-num {
-            font-size: 1.5rem !important;
-            font-weight: 700 !important;
-        }
+        .ats-circle-progress { width: 80px !important; height: 80px !important; }
+        .ats-score-value { font-size: 1.1rem !important; }
+        .ats-score-num { font-size: 1.4rem !important; font-weight: 700 !important; }
+        .ats-breakdown { gap: 12px !important; }
+        .breakdown-bar-container { height: 6px !important; border-radius: var(--radius-sm) !important; background: var(--border-color) !important; }
+        .breakdown-bar { height: 6px !important; border-radius: var(--radius-sm) !important; }
 
-        .ats-breakdown {
-            gap: 12px !important;
+        /* Webhook mini-block */
+        .webhook-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .webhook-inline p { margin: 0; font-size: 0.85rem; color: var(--text-secondary); flex: 1 1 260px; }
+        .webhook-advanced { margin-top: 10px; }
+        .webhook-advanced summary {
+            cursor: pointer;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            list-style: none;
         }
+        .webhook-advanced summary::-webkit-details-marker { display: none; }
+        .webhook-advanced summary::before { content: "🔧 "; }
 
-        .breakdown-bar-container {
-            height: 6px !important;
-            border-radius: var(--radius-sm) !important;
-            background: var(--border-color) !important;
-        }
-
-        .breakdown-bar {
-            height: 6px !important;
-            border-radius: var(--radius-sm) !important;
-        }
-
-        /* Scrollbar styles to match the sharp design */
-        ::-webkit-scrollbar-thumb {
-            border-radius: var(--radius-sm) !important;
-        }
+        ::-webkit-scrollbar-thumb { border-radius: var(--radius-sm) !important; }
     </style>
 </head>
 <body>
@@ -345,18 +285,18 @@
     <!-- Main Workspace -->
     <main class="workspace-container">
         <header class="workspace-header">
-            <h1 class="workspace-title">Akıllı CV Analiz & OCR Otomasyon Sistemi</h1>
-            <p class="workspace-subtitle">Özgeçmişinizi (PDF, PNG, JPG) yükleyin; OCR metin okuma, yapay zeka analizleri, ATS skorlaması ve n8n entegrasyonuyla anında değerlendirin.</p>
+            <h1 class="workspace-title">CV Analiz & OCR Sistemi</h1>
+            <p class="workspace-subtitle">Özgeçmişinizi (PDF, PNG, JPG) yükleyin: metnini çıkaralım, içindeki alanları (iletişim bilgisi, beceri, eğitim, deneyim) tespit edelim ve CV'nizi güçlendirecek somut tavsiyeler sunalım.</p>
         </header>
 
-        <div class="main-content">
-            <!-- Left Panel: File Input, OpenCV settings, SQLite History -->
-            <div class="upload-section">
+        <div class="flow-container">
+            <!-- 1. Upload -->
+            <div class="upload-section flow-card">
                 <h2 class="section-title">
                     <span class="section-icon">📤</span>
-                    CV Yükleme Paneli
+                    CV Yükle
                 </h2>
-                
+
                 <form id="ocrForm" onsubmit="event.preventDefault(); processDocument();">
                     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
                         <div id="uploadPrompt">
@@ -364,31 +304,30 @@
                             <div class="upload-text">CV'nizi buraya sürükleyin</div>
                             <div class="upload-subtext">veya tıklayarak dosya seçin (PDF, PNG, JPG)</div>
                         </div>
-                        <div id="previewContainer" class="preview-container" style="display: none;">
-                            <!-- Dynamically loaded preview -->
-                        </div>
+                        <div id="previewContainer" class="preview-container" style="display: none;"></div>
                         <input type="file" id="fileInput" name="file" class="file-input" accept="image/*,.pdf" required>
                     </div>
 
-                    <!-- OpenCV Settings -->
-                    <div class="opencv-settings">
-                        <h4 class="settings-title">⚙️ Görüntü Ön İşleme Ayarları (OpenCV)</h4>
-                        <div class="settings-group">
-                            <div class="form-group">
-                                <label for="binarizationMode" class="small-label">Eşikleme Yöntemi (Binarization):</label>
-                                <select id="binarizationMode" class="form-select">
-                                    <option value="otsu" selected>Otsu Thresholding (Varsayılan)</option>
-                                    <option value="adaptive">Adaptive Gaussian (Detaylı)</option>
-                                    <option value="none">Sadece Gri Tonlama (Filtresiz)</option>
-                                </select>
-                            </div>
-                            <div class="form-group checkbox-group">
-                                <input type="checkbox" id="autoDeskew" class="checkbox-input">
-                                <label for="autoDeskew" class="checkbox-label">Eğrilik Düzeltme (Auto-Deskew)</label>
+                    <details class="advanced-settings">
+                        <summary>Görüntü ön işleme ayarları</summary>
+                        <div class="opencv-settings">
+                            <div class="settings-group">
+                                <div class="form-group">
+                                    <label for="binarizationMode" class="small-label">Eşikleme Yöntemi:</label>
+                                    <select id="binarizationMode" class="form-select">
+                                        <option value="otsu" selected>Otsu Thresholding (Varsayılan)</option>
+                                        <option value="adaptive">Adaptive Gaussian (Detaylı)</option>
+                                        <option value="none">Sadece Gri Tonlama</option>
+                                    </select>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <input type="checkbox" id="autoDeskew" class="checkbox-input">
+                                    <label for="autoDeskew" class="checkbox-label">Eğrilik Düzeltme (Auto-Deskew)</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
+                    </details>
+
                     <div class="action-buttons">
                         <button type="submit" id="processBtn" class="btn btn-primary btn-full">
                             <span>🔍</span> CV Analizi Yap
@@ -399,228 +338,196 @@
                     </div>
                 </form>
 
-                <!-- SQLite History Panel -->
-                <div class="history-panel">
-                    <h4 class="settings-title border-top">📂 Son İşlenen Özgeçmişler</h4>
+                <details class="history-toggle">
+                    <summary>Son işlenen özgeçmişler</summary>
                     <div id="historyList" class="history-list">
                         <span class="no-data">Yüklenmiş özgeçmiş bulunamadı.</span>
                     </div>
-                </div>
+                </details>
             </div>
 
-            <!-- Right Panel: Dynamic Results with tabs -->
-            <div class="results-section">
-                <h2 class="section-title">
-                    <span class="section-icon">📝</span>
-                    Analiz Sonuçları
-                </h2>
-                
-                <!-- Progress Bar -->
-                <div id="progressBar" class="progress-bar">
-                    <div id="progressFill" class="progress-fill"></div>
-                </div>
-                
-                <!-- Status Message -->
-                <div id="statusMessage" class="status-message"></div>
+            <!-- Progress / Status -->
+            <div id="progressBar" class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div id="statusMessage" class="status-message"></div>
 
-                <!-- Tabs Navigation -->
-                <div class="results-tabs" id="resultsTabs" style="display: none;">
-                    <button type="button" class="tab-btn active" onclick="switchTab('textTab')">📄 Metin Çıktısı</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('cvTab')">🎓 CV Analizi</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('atsTab')">🏆 ATS Skor Kartı</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('roleTab')">🎯 Rol Uyum Analizörü</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('metadataTab')">📊 Akıllı Veri</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('webhookTab')">🔗 n8n / Webhook</button>
-                </div>
-                
-                <!-- Tab Contents -->
-                <div class="tab-contents">
-                    <!-- Tab 1: Text Output -->
-                    <div id="textTab" class="tab-pane active">
+            <!-- Results (hidden until a document is analyzed) -->
+            <div id="resultsWrapper" style="display: none;">
+
+                <!-- 2. Extracted text -->
+                <div class="results-section flow-card">
+                    <details class="text-result-toggle">
+                        <summary>📄 Çıkarılan Metin</summary>
                         <div id="resultArea" class="result-placeholder">
-                            Henüz bir özgeçmiş analiz edilmedi. Lütfen sol taraftan dosya yükleyin.
+                            Henüz bir özgeçmiş analiz edilmedi.
                         </div>
-                    </div>
-                    
-                    <!-- Tab: CV Analysis -->
-                    <div id="cvTab" class="tab-pane">
-                        <div class="metadata-container">
-                            <div class="metadata-group">
-                                <h4>🛠️ Belirlenen Teknik Beceriler (Skills)</h4>
-                                <div id="cvSkills" class="badge-list"><span class="no-data">Analiz edilmedi</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>🏫 Eğitim Bilgileri (Education)</h4>
-                                <div id="cvEducation" class="bullet-list">
-                                    <span class="no-data">Analiz edilmedi</span>
-                                </div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>💼 İş ve Deneyim İfadeleri (Experience)</h4>
-                                <div id="cvExperience" class="bullet-list">
-                                    <span class="no-data">Analiz edilmedi</span>
-                                </div>
-                            </div>
+                        <div id="resultActions" class="action-buttons" style="display: none; margin-top: 12px;">
+                            <button type="button" class="btn btn-primary" onclick="copyText()"><span>📋</span> Metni Kopyala</button>
+                            <button type="button" class="btn btn-secondary" onclick="downloadText()"><span>💾</span> İndir</button>
                         </div>
-                    </div>
+                    </details>
+                </div>
 
-                    <!-- Tab: ATS Score Card -->
-                    <div id="atsTab" class="tab-pane">
-                        <div class="ats-container">
-                            <div class="ats-score-header">
-                                <div class="ats-circle-progress">
-                                    <svg viewBox="0 0 100 100" class="progress-ring">
-                                        <circle class="progress-ring-bg" cx="50" cy="50" r="40"></circle>
-                                        <circle id="atsScoreRing" class="progress-ring-fill" cx="50" cy="50" r="40" style="stroke-dasharray: 251.2; stroke-dashoffset: 251.2;"></circle>
-                                    </svg>
-                                    <div class="ats-score-value">
-                                        <span id="atsScoreNum">0</span>
-                                        <span class="ats-score-label">ATS Puanı</span>
-                                    </div>
-                                </div>
-                                <div class="ats-score-summary">
-                                    <h3 id="atsScoreLevel">Hesaplanıyor...</h3>
-                                    <p id="atsScoreSummaryText">CV yapınızın puanlanması için lütfen sol taraftan bir belge analiz edin.</p>
-                                </div>
-                            </div>
-                            <div class="ats-breakdown">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Okunabilirlik / Düzen</span>
-                                    <div class="breakdown-bar-container">
-                                        <div id="barReadability" class="breakdown-bar" style="width: 0%;"></div>
-                                    </div>
-                                    <span id="txtReadability" class="breakdown-val">0/100</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Kelime / Karakter Sayısı</span>
-                                    <div class="breakdown-bar-container">
-                                        <div id="barLength" class="breakdown-bar" style="width: 0%;"></div>
-                                    </div>
-                                    <span id="txtLength" class="breakdown-val">0/100</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Eylem Fiilleri Kullanımı</span>
-                                    <div class="breakdown-bar-container">
-                                        <div id="barVerbs" class="breakdown-bar" style="width: 0%;"></div>
-                                    </div>
-                                    <span id="txtVerbs" class="breakdown-val">0/100</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Metrikler ve Sonuçlar</span>
-                                    <div class="breakdown-bar-container">
-                                        <div id="barMetrics" class="breakdown-bar" style="width: 0%;"></div>
-                                    </div>
-                                    <span id="txtMetrics" class="breakdown-val">0/100</span>
-                                </div>
-                            </div>
-                            <div class="ats-tips">
-                                <h4>💡 ATS İyileştirme Tavsiyeleri</h4>
-                                <ul id="atsTipsList" class="ats-tips-list">
-                                    <li>Lütfen bir CV yükleyin ve analiz edin.</li>
-                                </ul>
-                            </div>
+                <!-- 3. Extracted fields -->
+                <div class="results-section flow-card">
+                    <h2 class="section-title"><span class="section-icon">🧩</span> Tespit Edilen Alanlar</h2>
+                    <div class="metadata-container">
+                        <div class="metadata-group">
+                            <h4>👤 Kişi / Kurum / Lokasyon</h4>
+                            <div id="nerPersons" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            <div id="nerOrgs" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            <div id="nerLocs" class="badge-list"><span class="no-data">Veri yok</span></div>
                         </div>
-                    </div>
-
-                    <!-- Tab: Job Role Matcher -->
-                    <div id="roleTab" class="tab-pane">
-                        <div class="role-matcher-container">
-                            <p class="role-desc">Özgeçmişinizin belirli bir kariyer pozisyonuyla olan uyumunu ve anahtar kelime eşleşmesini analiz edin.</p>
-                            <div class="form-group">
-                                <label for="targetRoleSelect">Hedef Pozisyon Seçin</label>
-                                <select id="targetRoleSelect" class="form-select" onchange="calculateRoleMatch()">
-                                    <option value="python_dev">Python Developer</option>
-                                    <option value="frontend_dev">Frontend Developer (React/UI)</option>
-                                    <option value="data_scientist">Data Scientist (AI/ML)</option>
-                                    <option value="product_manager">Product Manager</option>
-                                </select>
-                            </div>
-                            <div class="role-match-result">
-                                <div class="match-score-card">
-                                    <span class="match-score-title">Rol Uyum Yüzdesi</span>
-                                    <span id="roleMatchScore" class="match-score-value">0%</span>
-                                </div>
-                                <div class="match-details">
-                                    <h4 id="roleMatchStatus">Analiz Bekleniyor...</h4>
-                                    <p id="roleMatchFeedback">Öncelikle sol taraftan bir CV yükleyin veya geçmişten bir döküman seçin.</p>
-                                </div>
-                            </div>
-                            <div class="keyword-analysis">
-                                <div class="keyword-group">
-                                    <h4 class="green-text">✔ Tespit Edilen Anahtar Kelimeler</h4>
-                                    <div id="foundKeywords" class="badge-list">
-                                        <span class="no-data">Veri yok</span>
-                                    </div>
-                                </div>
-                                <div class="keyword-group">
-                                    <h4 class="red-text">⚠ Eksik Anahtar Kelimeler (Kritik)</h4>
-                                    <div id="missingKeywords" class="badge-list">
-                                        <span class="no-data">Veri yok</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="metadata-group">
+                            <h4>📧 E-posta</h4>
+                            <div id="metaEmails" class="badge-list"><span class="no-data">Veri yok</span></div>
                         </div>
-                    </div>
-
-                    <!-- Tab 2: Smart Metadata -->
-                    <div id="metadataTab" class="tab-pane">
-                        <div class="metadata-container">
-                            <div class="metadata-group">
-                                <h4>👤 Tespit Edilen Kişiler (NER)</h4>
-                                <div id="nerPersons" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>🏢 Tespit Edilen Kurumlar / Şirketler (NER)</h4>
-                                <div id="nerOrgs" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>📍 Tespit Edilen Lokasyonlar (NER)</h4>
-                                <div id="nerLocs" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>📧 E-posta Adresleri</h4>
-                                <div id="metaEmails" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>📞 Telefon Numaraları</h4>
-                                <div id="metaPhones" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>📅 Tarihler</h4>
-                                <div id="metaDates" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
-                            <div class="metadata-group">
-                                <h4>🌐 Bağlantılar / Linkler</h4>
-                                <div id="metaUrls" class="badge-list"><span class="no-data">Veri yok</span></div>
-                            </div>
+                        <div class="metadata-group">
+                            <h4>📞 Telefon</h4>
+                            <div id="metaPhones" class="badge-list"><span class="no-data">Veri yok</span></div>
                         </div>
-                    </div>
-                    
-                    <!-- Tab 3: n8n/Webhook Integration -->
-                    <div id="webhookTab" class="tab-pane">
-                        <div class="webhook-container">
-                            <p class="webhook-desc">Elde edilen özgeçmiş verilerini otomatik olarak bir n8n kariyer senaryosuna veya özel bir webhook adresine gönderin.</p>
-                            <div class="form-group">
-                                <label for="webhookUrl">Webhook URL (n8n)</label>
-                                <input type="url" id="webhookUrl" placeholder="https://n8n.your-domain.com/g/webhook-id" value="http://localhost:5678/webhook-test/ocr-data">
-                            </div>
-                            <button type="button" class="btn btn-primary btn-webhook" onclick="sendToWebhook()">
-                                <span>🚀</span> Webhook'a Gönder
-                            </button>
-                            <div id="webhookStatus" class="webhook-status"></div>
+                        <div class="metadata-group">
+                            <h4>📅 Tarihler</h4>
+                            <div id="metaDates" class="badge-list"><span class="no-data">Veri yok</span></div>
+                        </div>
+                        <div class="metadata-group">
+                            <h4>🌐 Bağlantılar</h4>
+                            <div id="metaUrls" class="badge-list"><span class="no-data">Veri yok</span></div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Action Buttons for Results -->
-                <div id="resultActions" class="action-buttons" style="display: none;">
-                    <button type="button" class="btn btn-primary" onclick="copyText()">
-                        <span>📋</span> Metni Kopyala
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="downloadText()">
-                        <span>💾</span> İndir
-                    </button>
+
+                <!-- 4. Skills / Education / Experience -->
+                <div class="results-section flow-card">
+                    <h2 class="section-title"><span class="section-icon">🎓</span> Beceri, Eğitim & Deneyim</h2>
+                    <div class="metadata-container">
+                        <div class="metadata-group">
+                            <h4>🛠️ Teknik Beceriler</h4>
+                            <div id="cvSkills" class="badge-list"><span class="no-data">Analiz edilmedi</span></div>
+                        </div>
+                        <div class="metadata-group">
+                            <h4>🏫 Eğitim</h4>
+                            <div id="cvEducation" class="bullet-list"><span class="no-data">Analiz edilmedi</span></div>
+                        </div>
+                        <div class="metadata-group">
+                            <h4>💼 Deneyim</h4>
+                            <div id="cvExperience" class="bullet-list"><span class="no-data">Analiz edilmedi</span></div>
+                        </div>
+                        <div class="metadata-group">
+                            <h4>🗺️ Önerilen roadmap.sh Yol Haritaları</h4>
+                            <div id="roadmapSkillLinks" class="badge-list"><span class="no-data">Analiz edilmedi</span></div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- 5. ATS score + advice -->
+                <div class="results-section flow-card">
+                    <h2 class="section-title"><span class="section-icon">🏆</span> ATS Skoru & Tavsiyeler</h2>
+                    <div class="ats-container">
+                        <div class="ats-score-header">
+                            <div class="ats-circle-progress">
+                                <svg viewBox="0 0 100 100" class="progress-ring">
+                                    <circle class="progress-ring-bg" cx="50" cy="50" r="40"></circle>
+                                    <circle id="atsScoreRing" class="progress-ring-fill" cx="50" cy="50" r="40" style="stroke-dasharray: 251.2; stroke-dashoffset: 251.2;"></circle>
+                                </svg>
+                                <div class="ats-score-value">
+                                    <span id="atsScoreNum">0</span>
+                                    <span class="ats-score-label">ATS Puanı</span>
+                                </div>
+                            </div>
+                            <div class="ats-score-summary">
+                                <h3 id="atsScoreLevel">Hesaplanıyor...</h3>
+                                <p id="atsScoreSummaryText">CV yapınızın puanlanması için lütfen bir belge analiz edin.</p>
+                            </div>
+                        </div>
+                        <div class="ats-breakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Okunabilirlik / Düzen</span>
+                                <div class="breakdown-bar-container"><div id="barReadability" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <span id="txtReadability" class="breakdown-val">0/100</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Kelime / Karakter Sayısı</span>
+                                <div class="breakdown-bar-container"><div id="barLength" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <span id="txtLength" class="breakdown-val">0/100</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Eylem Fiilleri Kullanımı</span>
+                                <div class="breakdown-bar-container"><div id="barVerbs" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <span id="txtVerbs" class="breakdown-val">0/100</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Metrikler ve Sonuçlar</span>
+                                <div class="breakdown-bar-container"><div id="barMetrics" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <span id="txtMetrics" class="breakdown-val">0/100</span>
+                            </div>
+                        </div>
+                        <div class="ats-tips">
+                            <h4>💡 İyileştirme Tavsiyeleri</h4>
+                            <ul id="atsTipsList" class="ats-tips-list">
+                                <li>Lütfen bir CV yükleyin ve analiz edin.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Role match -->
+                <div class="results-section flow-card">
+                    <h2 class="section-title"><span class="section-icon">🎯</span> Pozisyon Uyumu</h2>
+                    <div class="role-matcher-container">
+                        <p class="role-desc">Özgeçmişinizin belirli bir pozisyonla anahtar kelime uyumunu görün.</p>
+                        <div class="form-group">
+                            <label for="targetRoleSelect">Hedef Pozisyon</label>
+                            <select id="targetRoleSelect" class="form-select" onchange="calculateRoleMatch()">
+                                <option value="python_dev">Python Developer</option>
+                                <option value="frontend_dev">Frontend Developer (React/UI)</option>
+                                <option value="data_scientist">Data Scientist (AI/ML)</option>
+                                <option value="product_manager">Product Manager</option>
+                            </select>
+                        </div>
+                        <div class="role-match-result">
+                            <div class="match-score-card">
+                                <span class="match-score-title">Rol Uyum Yüzdesi</span>
+                                <span id="roleMatchScore" class="match-score-value">0%</span>
+                            </div>
+                            <div class="match-details">
+                                <h4 id="roleMatchStatus">Analiz Bekleniyor...</h4>
+                                <p id="roleMatchFeedback">Öncelikle bir CV yükleyin.</p>
+                            </div>
+                        </div>
+                        <div class="keyword-analysis">
+                            <div class="keyword-group">
+                                <h4 class="green-text">✔ Tespit Edilen Anahtar Kelimeler</h4>
+                                <div id="foundKeywords" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                            <div class="keyword-group">
+                                <h4 class="red-text">⚠ Eksik Anahtar Kelimeler</h4>
+                                <div id="missingKeywords" class="badge-list"><span class="no-data">Veri yok</span></div>
+                            </div>
+                        </div>
+                        <a id="roleRoadmapLink" href="https://roadmap.sh/backend" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="display: inline-flex; margin-top: 14px;">🗺️ Python Developer yol haritasını roadmap.sh'ta görüntüle</a>
+                    </div>
+                </div>
+
+                <!-- 7. n8n webhook -->
+                <div class="results-section flow-card">
+                    <h2 class="section-title"><span class="section-icon">🔗</span> n8n Otomasyonu</h2>
+                    <div class="webhook-inline">
+                        <p>Çıkarılan veriyi tek tıkla n8n webhook'una gönderin.</p>
+                        <button type="button" class="btn btn-primary" onclick="sendToWebhook()">
+                            <span>🚀</span> n8n'e Gönder
+                        </button>
+                    </div>
+                    <details class="webhook-advanced">
+                        <summary>Özel webhook URL kullan</summary>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <input type="url" id="webhookUrl" class="form-select" style="width: 100%;" placeholder="https://n8n.your-domain.com/webhook/..." value="http://localhost:5678/webhook-test/ocr-data">
+                        </div>
+                    </details>
+                    <div id="webhookStatus" class="webhook-status"></div>
+                </div>
+
             </div>
         </div>
     </main>

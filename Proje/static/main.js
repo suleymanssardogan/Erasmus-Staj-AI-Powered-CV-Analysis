@@ -12,7 +12,7 @@ const statusMessage = document.getElementById('statusMessage');
 const resultArea = document.getElementById('resultArea');
 const resultActions = document.getElementById('resultActions');
 const processBtn = document.getElementById('processBtn');
-const resultsTabs = document.getElementById('resultsTabs');
+const resultsWrapper = document.getElementById('resultsWrapper');
 const uploadPrompt = document.getElementById('uploadPrompt');
 const previewContainer = document.getElementById('previewContainer');
 const themeToggle = document.getElementById('themeToggle');
@@ -130,9 +130,8 @@ async function processDocument() {
             // Calculate and display ATS Score and Role Match
             calculateATSScore(processedText);
             calculateRoleMatch();
-            
-            resultsTabs.style.display = 'flex';
-            switchTab('textTab');
+
+            resultsWrapper.style.display = 'block';
             loadHistoryList();
             
             showStatus(`✅ OCR işlemi başarıyla tamamlandı! ${result.char_count} karakter çıkarıldı.`, 'success');
@@ -216,19 +215,6 @@ function downloadText() {
     showStatus('💾 Dosya başarıyla indirildi!', 'success');
 }
 
-// Switch tabs inside results view
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
-    document.getElementById(tabId).classList.add('active');
-    
-    const clickedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
-        btn.getAttribute('onclick').includes(tabId)
-    );
-    if (clickedBtn) clickedBtn.classList.add('active');
-}
-
 // Display parsed metadata as badges & list items
 function displayMetadata(metadata) {
     const emailsDiv = document.getElementById('metaEmails');
@@ -294,7 +280,8 @@ function displayMetadata(metadata) {
         } else {
             skillsDiv.innerHTML = skills.map(skill => `<span class="meta-badge badge-url">🛠️ ${skill}</span>`).join('');
         }
-        
+        renderRoadmapSuggestions(skills);
+
         const edu = metadata.cv_analysis.education || [];
         if (edu.length === 0) {
             eduDiv.innerHTML = '<span class="no-data">Herhangi bir eğitim bilgisi tespit edilemedi</span>';
@@ -314,7 +301,79 @@ function displayMetadata(metadata) {
         if (skillsDiv) skillsDiv.innerHTML = '<span class="no-data">Analiz edilmedi</span>';
         if (eduDiv) eduDiv.innerHTML = '<span class="no-data">Analiz edilmedi</span>';
         if (expDiv) expDiv.innerHTML = '<span class="no-data">Analiz edilmedi</span>';
+        renderRoadmapSuggestions([]);
     }
+}
+
+// ==========================================
+// roadmap.sh Suggestions
+// ==========================================
+
+// Maps skill labels (as produced by Proje/app.py's analyze_cv_content) to a roadmap.sh roadmap.
+// Skills without a solid roadmap.sh equivalent (n8n, OpenCV, Office) are intentionally left unmapped.
+const SKILL_ROADMAP_MAP = {
+    "Python": { slug: "python", title: "Python" },
+    "Java": { slug: "java", title: "Java" },
+    "C++": { slug: "cpp", title: "C++" },
+    "JavaScript / TypeScript": { slug: "javascript", title: "JavaScript" },
+    "HTML / CSS": { slug: "html", title: "HTML / CSS" },
+    "React / Vue / Angular": { slug: "react", title: "React" },
+    "Node.js / Django / Flask": { slug: "backend", title: "Backend Development" },
+    "SQL / NoSQL": { slug: "sql", title: "SQL" },
+    "Git": { slug: "git-github", title: "Git & GitHub" },
+    "Docker / Kubernetes": { slug: "docker", title: "Docker" },
+    "Bulut Bilişim (Cloud)": { slug: "aws", title: "AWS" },
+    "Yapay Zeka (AI / ML)": { slug: "ai-engineer", title: "AI Engineer" },
+    "Proje Yönetimi / Agile": { slug: "product-manager", title: "Product Manager" }
+};
+
+// Maps the role matcher's target roles to a roadmap.sh role-based roadmap.
+const ROLE_ROADMAP_MAP = {
+    python_dev: { slug: "backend", title: "Backend Developer" },
+    frontend_dev: { slug: "frontend", title: "Frontend Developer" },
+    data_scientist: { slug: "ai-data-scientist", title: "AI & Data Scientist" },
+    product_manager: { slug: "product-manager", title: "Product Manager" }
+};
+
+// Render roadmap.sh links for the CV's detected skills
+function renderRoadmapSuggestions(skills) {
+    const container = document.getElementById('roadmapSkillLinks');
+    if (!container) return;
+
+    const mapped = (skills || [])
+        .map(skill => SKILL_ROADMAP_MAP[skill])
+        .filter(Boolean);
+
+    // De-duplicate by slug (e.g. Node.js/Django/Flask and Python could both point at backend)
+    const seen = new Set();
+    const unique = mapped.filter(r => {
+        if (seen.has(r.slug)) return false;
+        seen.add(r.slug);
+        return true;
+    });
+
+    if (unique.length === 0) {
+        container.innerHTML = '<span class="no-data">Beceri tespit edilmedi, önerilecek yol haritası yok</span>';
+        return;
+    }
+
+    container.innerHTML = unique.map(r =>
+        `<a href="https://roadmap.sh/${r.slug}" target="_blank" rel="noopener noreferrer" class="meta-badge badge-url">🗺️ ${r.title}</a>`
+    ).join('');
+}
+
+// Update the role-based roadmap.sh link to match the selected target role
+function updateRoleRoadmapLink(roleKey) {
+    const link = document.getElementById('roleRoadmapLink');
+    if (!link) return;
+    const roadmap = ROLE_ROADMAP_MAP[roleKey];
+    if (!roadmap) {
+        link.style.display = 'none';
+        return;
+    }
+    link.href = `https://roadmap.sh/${roadmap.slug}`;
+    link.textContent = `🗺️ ${roadmap.title} yol haritasını roadmap.sh'ta görüntüle`;
+    link.style.display = 'inline-flex';
 }
 
 // SQLite document history list fetching
@@ -371,10 +430,9 @@ async function loadHistoryItem(docId) {
             // Calculate and display ATS Score and Role Match
             calculateATSScore(processedText);
             calculateRoleMatch();
-            
-            resultsTabs.style.display = 'flex';
-            switchTab('textTab');
-            
+
+            resultsWrapper.style.display = 'block';
+
             showStatus(`📂 Geçmiş belge yüklendi: ${doc.filename}`, 'success');
         } else {
             showStatus(`❌ Geçmiş yükleme hatası: ${result.error}`, 'error');
@@ -448,18 +506,9 @@ function clearAll() {
     uploadPrompt.style.display = 'block';
     previewContainer.style.display = 'none';
     previewContainer.innerHTML = '';
-    resultsTabs.style.display = 'none';
-    
-    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-    document.getElementById('textTab').classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
-    const textTabBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
-        btn.getAttribute('onclick').includes('textTab')
-    );
-    if (textTabBtn) textTabBtn.classList.add('active');
-    
-    resultArea.innerHTML = 'Henüz bir döküman işlenmedi. Lütfen sol taraftan bir belge seçin.';
+    resultsWrapper.style.display = 'none';
+
+    resultArea.innerHTML = 'Henüz bir döküman işlenmedi. Lütfen bir belge seçin.';
     resultArea.className = 'result-placeholder';
     resultActions.style.display = 'none';
     
@@ -471,7 +520,9 @@ function clearAll() {
     document.getElementById('cvSkills').innerHTML = '<span class="no-data">Analiz edilmedi</span>';
     document.getElementById('cvEducation').innerHTML = '<span class="no-data">Analiz edilmedi</span>';
     document.getElementById('cvExperience').innerHTML = '<span class="no-data">Analiz edilmedi</span>';
-    
+    renderRoadmapSuggestions([]);
+
+
     const webhookStatus = document.getElementById('webhookStatus');
     if (webhookStatus) {
         webhookStatus.style.display = 'none';
@@ -854,7 +905,8 @@ function calculateRoleMatch() {
     
     const selectedRoleKey = roleSelect.value;
     const roleData = rolesKeywords[selectedRoleKey];
-    
+    updateRoleRoadmapLink(selectedRoleKey);
+
     if (!text) {
         resetRoleMatch();
         return;
@@ -922,8 +974,8 @@ function resetRoleMatch() {
     }
     
     const feedbackEl = document.getElementById('roleMatchFeedback');
-    if (feedbackEl) feedbackEl.textContent = 'Öncelikle sol taraftan bir CV yükleyin veya geçmişten bir döküman seçin.';
-    
+    if (feedbackEl) feedbackEl.textContent = 'Öncelikle bir CV yükleyin veya geçmişten bir döküman seçin.';
+
     const foundDiv = document.getElementById('foundKeywords');
     if (foundDiv) foundDiv.innerHTML = '<span class="no-data">Veri yok</span>';
     
@@ -1014,7 +1066,6 @@ window.processDocument = processDocument;
 window.copyText = copyText;
 window.downloadText = downloadText;
 window.clearAll = clearAll;
-window.switchTab = switchTab;
 window.sendToWebhook = sendToWebhook;
 window.loadHistoryItem = loadHistoryItem;
 window.googleSignIn = googleSignIn;
