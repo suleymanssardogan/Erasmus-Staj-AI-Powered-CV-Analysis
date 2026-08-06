@@ -1,3 +1,35 @@
+// ==========================================
+// Inline line-icon set (replaces emoji across the UI)
+// ==========================================
+function svgIcon(paths, extraClass) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon${extraClass ? ' ' + extraClass : ''}">${paths}</svg>`;
+}
+
+const ICONS = {
+    search: svgIcon('<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+    trash: svgIcon('<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
+    clipboard: svgIcon('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/>'),
+    download: svgIcon('<path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/>'),
+    send: svgIcon('<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>'),
+    folder: svgIcon('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>'),
+    fileText: svgIcon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'),
+    user: svgIcon('<circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>'),
+    mail: svgIcon('<rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/>'),
+    phone: svgIcon('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>'),
+    calendar: svgIcon('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
+    globe: svgIcon('<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'),
+    building: svgIcon('<rect x="4" y="2" width="16" height="20" rx="1"/><line x1="8" y1="6" x2="8" y2="6.01"/><line x1="16" y1="6" x2="16" y2="6.01"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/>'),
+    mapPin: svgIcon('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+    wrench: svgIcon('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>'),
+    map: svgIcon('<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>'),
+    check: svgIcon('<polyline points="20 6 9 17 4 12"/>'),
+    checkCircle: svgIcon('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'),
+    xCircle: svgIcon('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'),
+    alertTriangle: svgIcon('<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+    info: svgIcon('<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'),
+    loader: svgIcon('<circle cx="12" cy="12" r="9" stroke-dasharray="42 14"/>', 'spin'),
+};
+
 // Global State Variables
 let selectedFile = null;
 let processedText = '';
@@ -54,7 +86,7 @@ function handleFile(file) {
     const isValidMime = validMimeTypes.includes(file.type) || file.type === ''; // Fallback for mime type
     
     if (!isValidExtension && !isValidMime) {
-        showStatus('❌ Geçersiz dosya türü! Lütfen görsel (PNG, JPG vb.) veya PDF yükleyin.', 'error');
+        showStatus('Geçersiz dosya türü! Lütfen görsel (PNG, JPG vb.) veya PDF yükleyin.', 'error');
         fileInput.value = '';
         selectedFile = null;
         return;
@@ -83,7 +115,7 @@ function handleFile(file) {
     } else {
         previewContainer.innerHTML = `
             <div class="preview-card">
-                <div class="preview-pdf-icon">📄</div>
+                <div class="preview-pdf-icon">${ICONS.fileText}</div>
                 <div class="preview-info">
                     <div class="preview-name">${file.name}</div>
                     <div class="preview-size">${fileSize} MB</div>
@@ -101,7 +133,7 @@ async function processDocument() {
     }
     
     processBtn.disabled = true;
-    processBtn.innerHTML = '<span>⏳</span> İşleniyor...';
+    processBtn.innerHTML = `<span>${ICONS.loader}</span> İşleniyor...`;
     showProgress();
     
     const binarizationMode = document.getElementById('binarizationMode').value;
@@ -134,17 +166,17 @@ async function processDocument() {
             resultsWrapper.style.display = 'block';
             loadHistoryList();
             
-            showStatus(`✅ OCR işlemi başarıyla tamamlandı! ${result.char_count} karakter çıkarıldı.`, 'success');
+            showStatus(`OCR işlemi başarıyla tamamlandı! ${result.char_count} karakter çıkarıldı.`, 'success');
         } else {
-            showStatus(`❌ Hata: ${result.error}`, 'error');
+            showStatus(`Hata: ${result.error}`, 'error');
         }
     } catch (error) {
         hideProgress();
-        showStatus(`❌ Bağlantı hatası: ${error.message}`, 'error');
+        showStatus(`Bağlantı hatası: ${error.message}`, 'error');
         console.error('OCR Error:', error);
     } finally {
         processBtn.disabled = false;
-        processBtn.innerHTML = '<span>🔍</span> Metni Çıkar & Analiz Et';
+        processBtn.innerHTML = `<span>${ICONS.search}</span> Metni Çıkar & Analiz Et`;
     }
 }
 
@@ -195,7 +227,7 @@ function displayResult(text, filename) {
 function copyText() {
     if (!processedText) return;
     navigator.clipboard.writeText(processedText)
-        .then(() => showStatus('📋 Metin panoya kopyalandı!', 'success'))
+        .then(() => showStatus('Metin panoya kopyalandı!', 'success'))
         .catch(err => console.error('Copy failed:', err));
 }
 
@@ -212,7 +244,7 @@ function downloadText() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showStatus('💾 Dosya başarıyla indirildi!', 'success');
+    showStatus('Dosya başarıyla indirildi!', 'success');
 }
 
 // Display parsed metadata as badges & list items
@@ -230,20 +262,20 @@ function displayMetadata(metadata) {
         }
         div.innerHTML = list.map(item => {
             if (type === 'email') {
-                return `<a href="mailto:${item}" class="meta-badge badge-email">✉️ ${item}</a>`;
+                return `<a href="mailto:${item}" class="meta-badge badge-email">${ICONS.mail} ${item}</a>`;
             } else if (type === 'phone') {
-                return `<a href="tel:${item.replace(/\s+/g, '')}" class="meta-badge badge-phone">📞 ${item}</a>`;
+                return `<a href="tel:${item.replace(/\s+/g, '')}" class="meta-badge badge-phone">${ICONS.phone} ${item}</a>`;
             } else if (type === 'url') {
                 const displayUrl = item.startsWith('http') ? item : `https://${item}`;
-                return `<a href="${displayUrl}" target="_blank" class="meta-badge badge-url">🌐 ${item}</a>`;
+                return `<a href="${displayUrl}" target="_blank" class="meta-badge badge-url">${ICONS.globe} ${item}</a>`;
             } else if (type === 'ner_person') {
-                return `<span class="meta-badge badge-email">👤 ${item}</span>`;
+                return `<span class="meta-badge badge-email">${ICONS.user} ${item}</span>`;
             } else if (type === 'ner_org') {
-                return `<span class="meta-badge badge-phone">🏢 ${item}</span>`;
+                return `<span class="meta-badge badge-phone">${ICONS.building} ${item}</span>`;
             } else if (type === 'ner_loc') {
-                return `<span class="meta-badge badge-url">📍 ${item}</span>`;
+                return `<span class="meta-badge badge-url">${ICONS.mapPin} ${item}</span>`;
             } else {
-                return `<span class="meta-badge badge-date">📅 ${item}</span>`;
+                return `<span class="meta-badge badge-date">${ICONS.calendar} ${item}</span>`;
             }
         }).join('');
     };
@@ -278,7 +310,7 @@ function displayMetadata(metadata) {
         if (skills.length === 0) {
             skillsDiv.innerHTML = '<span class="no-data">Herhangi bir teknik beceri tespit edilemedi</span>';
         } else {
-            skillsDiv.innerHTML = skills.map(skill => `<span class="meta-badge badge-url">🛠️ ${skill}</span>`).join('');
+            skillsDiv.innerHTML = skills.map(skill => `<span class="meta-badge badge-url">${ICONS.wrench} ${skill}</span>`).join('');
         }
         renderRoadmapSuggestions(skills);
 
@@ -358,7 +390,7 @@ function renderRoadmapSuggestions(skills) {
     }
 
     container.innerHTML = unique.map(r =>
-        `<a href="https://roadmap.sh/${r.slug}" target="_blank" rel="noopener noreferrer" class="meta-badge badge-url">🗺️ ${r.title}</a>`
+        `<a href="https://roadmap.sh/${r.slug}" target="_blank" rel="noopener noreferrer" class="meta-badge badge-url">${ICONS.map} ${r.title}</a>`
     ).join('');
 }
 
@@ -372,7 +404,7 @@ function updateRoleRoadmapLink(roleKey) {
         return;
     }
     link.href = `https://roadmap.sh/${roadmap.slug}`;
-    link.textContent = `🗺️ ${roadmap.title} yol haritasını roadmap.sh'ta görüntüle`;
+    link.innerHTML = `${ICONS.map} ${roadmap.title} yol haritasını roadmap.sh'ta görüntüle`;
     link.style.display = 'inline-flex';
 }
 
@@ -433,13 +465,13 @@ async function loadHistoryItem(docId) {
 
             resultsWrapper.style.display = 'block';
 
-            showStatus(`📂 Geçmiş belge yüklendi: ${doc.filename}`, 'success');
+            showStatus(`Geçmiş belge yüklendi: ${doc.filename}`, 'success');
         } else {
-            showStatus(`❌ Geçmiş yükleme hatası: ${result.error}`, 'error');
+            showStatus(`Geçmiş yükleme hatası: ${result.error}`, 'error');
         }
     } catch (error) {
         hideProgress();
-        showStatus(`❌ Geçmiş yükleme hatası: ${error.message}`, 'error');
+        showStatus(`Geçmiş yükleme hatası: ${error.message}`, 'error');
     }
 }
 
@@ -460,7 +492,7 @@ async function sendToWebhook() {
     
     webhookStatus.style.display = 'block';
     webhookStatus.className = 'webhook-status status-info';
-    webhookStatus.innerHTML = '⏳ Veri gönderiliyor, lütfen bekleyin...';
+    webhookStatus.innerHTML = `<span>${ICONS.loader}</span> Veri gönderiliyor, lütfen bekleyin...`;
     
     const payload = {
         timestamp: new Date().toISOString(),
@@ -485,14 +517,14 @@ async function sendToWebhook() {
         const result = await response.json();
         if (result.success) {
             webhookStatus.className = 'webhook-status status-success';
-            webhookStatus.innerHTML = `✅ Webhook başarıyla tetiklendi!<br><small>Durum Kodu: ${result.status_code}</small>`;
+            webhookStatus.innerHTML = `<span>${ICONS.checkCircle}</span> Webhook başarıyla tetiklendi!<br><small>Durum Kodu: ${result.status_code}</small>`;
         } else {
             webhookStatus.className = 'webhook-status status-error';
-            webhookStatus.innerHTML = `❌ Hata: ${result.error}`;
+            webhookStatus.innerHTML = `<span>${ICONS.xCircle}</span> Hata: ${result.error}`;
         }
     } catch (error) {
         webhookStatus.className = 'webhook-status status-error';
-        webhookStatus.innerHTML = `❌ Bağlantı hatası: ${error.message}`;
+        webhookStatus.innerHTML = `<span>${ICONS.xCircle}</span> Bağlantı hatası: ${error.message}`;
     }
 }
 
@@ -533,12 +565,12 @@ function clearAll() {
     progressFill.style.width = '0%';
     
     processBtn.disabled = false;
-    processBtn.innerHTML = '<span>🔍</span> Metni Çıkar & Analiz Et';
+    processBtn.innerHTML = `<span>${ICONS.search}</span> Metni Çıkar & Analiz Et`;
     
     resetATSScore();
     resetRoleMatch();
     
-    showStatus('🗑️ Tüm veriler temizlendi.', 'success');
+    showStatus('Tüm veriler temizlendi.', 'success');
 }
 
 // Show Status alert toast
@@ -553,14 +585,13 @@ function showStatus(msg, type) {
     
     const toast = document.createElement('div');
     toast.className = `status-message status-${type}`;
-    toast.style.cssText = 'margin: 0; padding: 12px 24px; border-radius: var(--radius-md); animation: slideIn 0.3s ease; box-shadow: var(--shadow-lg); font-size: 0.9rem; font-weight: 500; min-width: 250px; display: block;';
-    
-    let emoji = 'ℹ️';
-    if (type === 'success') emoji = '✅';
-    else if (type === 'error') emoji = '❌';
-    else if (type === 'info') emoji = 'ℹ️';
-    
-    toast.innerHTML = `${emoji} ${msg}`;
+    toast.style.cssText = 'margin: 0; padding: 12px 24px; border-radius: var(--radius-md); animation: slideIn 0.3s ease; box-shadow: var(--shadow-lg); font-size: 0.9rem; font-weight: 500; min-width: 250px; display: flex; align-items: center; gap: 10px;';
+
+    let toastIcon = ICONS.info;
+    if (type === 'success') toastIcon = ICONS.checkCircle;
+    else if (type === 'error') toastIcon = ICONS.xCircle;
+
+    toast.innerHTML = `<span style="font-size: 1.1rem; flex-shrink: 0;">${toastIcon}</span><span>${msg}</span>`;
     container.appendChild(toast);
     
     setTimeout(() => {
@@ -796,24 +827,24 @@ function calculateATSScore(text) {
     if (levelEl && descEl && tipsList) {
         tipsList.innerHTML = '';
         if (totalScore >= 85) {
-            levelEl.textContent = '🏆 Mükemmel Seviyede';
+            levelEl.textContent = 'Mükemmel Seviyede';
             levelEl.style.color = '#27c93f';
             descEl.textContent = 'Özgeçmişiniz ATS tarayıcıları ve İK filtreleri için en iyi standartlara sahip.';
             tipsList.innerHTML += '<li>CV yapınız harika! Mevcut yapıyı bozmadan güncel tutmaya devam edin.</li>';
         } else if (totalScore >= 70) {
-            levelEl.textContent = '✨ İyi Seviyede';
+            levelEl.textContent = 'İyi Seviyede';
             levelEl.style.color = 'var(--accent-purple)';
             descEl.textContent = 'Özgeçmişiniz çoğu filtreden geçebilir ancak ufak iyileştirmelerle şansınızı artırabilirsiniz.';
             tipsList.innerHTML += '<li>İş deneyimlerinizde başarılarınızı daha fazla metrikle (% ve sayılar) destekleyin.</li>';
             tipsList.innerHTML += '<li>Zayıf bölümlerdeki fiilleri daha aktif eylem kelimeleriyle değiştirin.</li>';
         } else if (totalScore >= 50) {
-            levelEl.textContent = '⚠ Geliştirilmeli';
+            levelEl.textContent = 'Geliştirilmeli';
             levelEl.style.color = '#FBBC05';
             descEl.textContent = 'CV içeriğiniz ATS sistemlerinde takılabilir. Aşağıdaki önerileri uygulamanız önerilir.';
             tipsList.innerHTML += '<li>Daha fazla teknik anahtar kelime ve eylem odaklı kelime kullanın.</li>';
             tipsList.innerHTML += '<li>Deneyim tanımlarını çok kısa tutmak yerine yaptığınız projeleri detaylandırın.</li>';
         } else {
-            levelEl.textContent = '❌ Zayıf Uyum';
+            levelEl.textContent = 'Zayıf Uyum';
             levelEl.style.color = '#ff5f56';
             descEl.textContent = 'Belgedeki okunabilir metin oranı çok az veya biçimlendirme ATS standartlarına uymuyor.';
             tipsList.innerHTML += '<li>CV\'nizi tek sütunlu ve standart yazı tiplerine sahip temiz bir formata dönüştürün.</li>';
@@ -934,15 +965,15 @@ function calculateRoleMatch() {
     const feedbackEl = document.getElementById('roleMatchFeedback');
     
     if (matchPercentage >= 80) {
-        statusEl.textContent = '🌟 Güçlü Uyum!';
+        statusEl.textContent = 'Güçlü Uyum!';
         statusEl.style.color = '#27c93f';
         feedbackEl.textContent = `Özgeçmişiniz ${roleData.title} pozisyonu için kritik anahtar kelimelerin çoğunu barındırıyor. Harika bir eşleşme!`;
     } else if (matchPercentage >= 50) {
-        statusEl.textContent = '⚖ Orta Düzey Uyum';
+        statusEl.textContent = 'Orta Düzey Uyum';
         statusEl.style.color = 'var(--accent-purple)';
         feedbackEl.textContent = `Temel gereksinimlerin bir kısmı mevcut ancak ${roleData.title} ilanı için şansınızı artırmak adına eksik teknolojileri CV'nize ekleyebilirsiniz.`;
     } else {
-        statusEl.textContent = '❌ Düşük Uyum';
+        statusEl.textContent = 'Düşük Uyum';
         statusEl.style.color = '#ff5f56';
         feedbackEl.textContent = `Bu rol için aranan temel becerilerden birçoğu eksik görünüyor. Aşağıdaki eksik kelimeleri projelerinizle entegre etmeniz önerilir.`;
     }
@@ -953,13 +984,13 @@ function calculateRoleMatch() {
     if (found.length === 0) {
         foundDiv.innerHTML = '<span class="no-data">Eşleşen kelime bulunamadı</span>';
     } else {
-        foundDiv.innerHTML = found.map(kw => `<span class="meta-badge badge-url" style="background: rgba(39, 201, 63, 0.1); color: #27c93f; border-color: rgba(39, 201, 63, 0.2);">✔ ${kw}</span>`).join('');
+        foundDiv.innerHTML = found.map(kw => `<span class="meta-badge badge-url" style="background: rgba(39, 201, 63, 0.1); color: #27c93f; border-color: rgba(39, 201, 63, 0.2);">${ICONS.check} ${kw}</span>`).join('');
     }
     
     if (missing.length === 0) {
         missingDiv.innerHTML = '<span class="no-data" style="color: #27c93f;">Tebrikler, tüm anahtar kelimeler mevcut!</span>';
     } else {
-        missingDiv.innerHTML = missing.map(kw => `<span class="meta-badge badge-url" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56; border-color: rgba(255, 95, 86, 0.2);">⚠ ${kw}</span>`).join('');
+        missingDiv.innerHTML = missing.map(kw => `<span class="meta-badge badge-url" style="background: rgba(255, 95, 86, 0.1); color: #ff5f56; border-color: rgba(255, 95, 86, 0.2);">${ICONS.alertTriangle} ${kw}</span>`).join('');
     }
 }
 

@@ -88,6 +88,42 @@ body {
     background: var(--text-muted);
 }
 
+/* Inline line-icon system (replaces emoji throughout the UI) */
+.ui-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    flex-shrink: 0;
+}
+
+.ui-icon.spin {
+    animation: icon-spin 0.9s linear infinite;
+}
+
+@keyframes icon-spin {
+    to { transform: rotate(360deg); }
+}
+
+.section-icon,
+.toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.section-title .section-icon {
+    margin-right: 4px;
+    color: var(--accent-purple);
+}
+
+.badge-icon-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* Structure & Utility */
 .section {
     padding: 100px 24px;
