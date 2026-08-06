@@ -76,6 +76,23 @@ function initializeDragAndDrop() {
     });
 }
 
+// Some deployments (e.g. the Vercel demo) run without Tesseract/OpenCV installed.
+// Surface that clearly instead of letting the analyze button fail silently.
+async function checkOcrAvailability() {
+    const notice = document.getElementById('ocrUnavailableNotice');
+    if (!notice) return;
+    try {
+        const response = await fetch('/api/health');
+        const result = await response.json();
+        if (result.ocr_available === false) {
+            notice.style.display = 'block';
+            if (processBtn) processBtn.disabled = true;
+        }
+    } catch (error) {
+        console.warn('OCR availability check failed:', error.message);
+    }
+}
+
 // Handle selected file (Image/PDF validation & Preview)
 function handleFile(file) {
     const fileExtension = file.name.split('.').pop().toLowerCase();
@@ -1041,7 +1058,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeFAQ();
     initializeTheme();
     updateNavbarUser();
-    
+    checkOcrAvailability();
+
     // Check if page contains elements for history loading
     if (document.getElementById('historyList')) {
         loadHistoryList();

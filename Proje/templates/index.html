@@ -329,6 +329,10 @@
                     CV Yükle
                 </h2>
 
+                <div id="ocrUnavailableNotice" class="webhook-status status-info" style="display: none; margin-bottom: 16px;">
+                    Bu demo dağıtımında OCR analizi devre dışı (Tesseract/OpenCV gerektirir). Tam özellikli sürüm için projenin Docker imajını çalıştırın.
+                </div>
+
                 <form id="ocrForm" onsubmit="event.preventDefault(); processDocument();">
                     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
                         <div id="uploadPrompt">

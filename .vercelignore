@@ -1,0 +1,17 @@
+# Bu demo dağıtımı OCR içermez; tam Docker imajına özgü/ağır dosyaları dışarıda bırak
+tessdata/
+uploads/
+documents.db
+packages_mac/
+Erasmus-Staj-AI-Powered-CV-Analysis/
+evaluate_system.py
+evaluation_results.md
+.venv/
+.venv_mac/
+venv/
+__pycache__/
+*.pyc
+tmp/
+Dockerfile
+docker-compose.yml
+requirements-full.txt

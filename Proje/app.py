@@ -5,17 +5,29 @@ import re
 import json
 import urllib.request
 from werkzeug.utils import secure_filename
-import cv2
-import numpy as np
-import pytesseract
-from PIL import Image
-from pypdf import PdfReader
-from pdf2image import convert_from_path
 
 from Proje.database import init_db, save_document, get_documents_history, get_document_by_id
 
+# OCR bağımlılıkları (Tesseract/OpenCV/Poppler) yalnızca sistem kütüphaneleriyle birlikte
+# kurulu ortamlarda (Docker imajı, yerel kurulum) mevcuttur. Bu paketler olmadan da uygulamanın
+# geri kalanının (arayüz, roadmap.sh önerileri, n8n webhook) çökmeden ayağa kalkabilmesi için
+# import'lar burada opsiyonel tutulur; OCR_AVAILABLE bayrağı /api/ocr içinde kontrol edilir.
+try:
+    import cv2
+    import numpy as np
+    import pytesseract
+    from PIL import Image
+    from pypdf import PdfReader
+    from pdf2image import convert_from_path
+    OCR_AVAILABLE = True
+except ImportError:
+    OCR_AVAILABLE = False
+
+# Vercel'in serverless çalışma zamanında dosya sistemi salt-okunurdur; /tmp dışına yazılamaz.
+IS_SERVERLESS = bool(os.environ.get("VERCEL"))
+
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "/tmp/uploads" if IS_SERVERLESS else "uploads"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'pdf'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -25,20 +37,21 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 init_db()
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# TESSDATA_PREFIX ortam değişkenini proje düzeyindeki yerel klasörü kullanacak şekilde ayarla
-root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-os.environ["TESSDATA_PREFIX"] = os.path.join(root_dir, "tessdata")
+if OCR_AVAILABLE:
+    # TESSDATA_PREFIX ortam değişkenini proje düzeyindeki yerel klasörü kullanacak şekilde ayarla
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.environ["TESSDATA_PREFIX"] = os.path.join(root_dir, "tessdata")
 
-# Tesseract yolunu macOS ve Linux için yapılandır
-tesseract_paths = [
-    "/usr/bin/tesseract",
-    "/usr/local/bin/tesseract",
-    "/opt/homebrew/bin/tesseract"
-]
-for path in tesseract_paths:
-    if os.path.exists(path):
-        pytesseract.pytesseract.tesseract_cmd = path
-        break
+    # Tesseract yolunu macOS ve Linux için yapılandır
+    tesseract_paths = [
+        "/usr/bin/tesseract",
+        "/usr/local/bin/tesseract",
+        "/opt/homebrew/bin/tesseract"
+    ]
+    for path in tesseract_paths:
+        if os.path.exists(path):
+            pytesseract.pytesseract.tesseract_cmd = path
+            break
 
 def allowed_file(filename):
     """Dosya uzantısının izin verilen türde olup olmadığını kontrol eder"""
@@ -141,6 +154,8 @@ def extract_metadata(text):
 
 def get_best_ocr_lang():
     """Sistemde mevcut olan en iyi dil paketini seçer (öncelik Türkçe)"""
+    if not OCR_AVAILABLE:
+        return 'unavailable'
     try:
         available_langs = pytesseract.get_languages()
         if 'tur' in available_langs:
@@ -376,6 +391,13 @@ def test():
 @app.route("/api/ocr", methods=["POST"])
 def upload_file():
     """Dosya yükleme ve OCR işlemi"""
+    if not OCR_AVAILABLE:
+        return jsonify({
+            "success": False,
+            "error": "OCR analizi bu dağıtımda devre dışı (Tesseract/OpenCV/Poppler gerektirir). "
+                     "Tam özellikli sürüm için projenin Docker imajını çalıştırın."
+        }), 503
+
     start_time = time.time()
     try:
         # Dosya varlığını kontrol et
@@ -524,7 +546,8 @@ def health_check():
     """Sistem sağlık kontrolü"""
     return jsonify({
         "status": "healthy",
-        "message": "OCR Sistemi çalışıyor",
+        "message": "OCR Sistemi çalışıyor" if OCR_AVAILABLE else "Sistem çalışıyor (bu dağıtımda OCR devre dışı)",
+        "ocr_available": OCR_AVAILABLE,
         "upload_folder": UPLOAD_FOLDER,
         "allowed_extensions": list(ALLOWED_EXTENSIONS),
         "tesseract_lang": get_best_ocr_lang()

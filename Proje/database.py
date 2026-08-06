@@ -2,7 +2,9 @@ import sqlite3
 import os
 import json
 
-DB_PATH = "documents.db"
+# Vercel'in serverless çalışma zamanında dosya sistemi salt-okunurdur; yalnızca /tmp
+# yazılabilir ve fonksiyon çağrıları arasında kalıcı değildir (demo amaçlı yeterlidir).
+DB_PATH = "/tmp/documents.db" if os.environ.get("VERCEL") else "documents.db"
 
 def init_db():
     """Veritabanını ve belgeler tablosunu başlatır"""

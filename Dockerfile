@@ -1,34 +1,55 @@
-# Python slim resmi imajını kullan
-FROM python:3.11-slim
+# syntax=docker/dockerfile:1
 
-# Çevre değişkenlerini ayarla
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# ---------- Stage 1: builder ----------
+# Bağımlılıkları izole bir virtualenv içine kurar; derleme araçları
+# (gcc vb. gerekirse) bu aşamada kalır ve runtime imajına taşınmaz.
+FROM python:3.11-slim AS builder
 
-# Çalışma dizinini oluştur
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
 WORKDIR /app
 
-# Gerekli sistem bağımlılıklarını kur (Tesseract OCR, Türkçe Dil Paketi, OpenCV bağımlılıkları ve Poppler)
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements-full.txt .
+RUN pip install --upgrade pip && \
+    pip install -r requirements-full.txt
+
+# ---------- Stage 2: runtime ----------
+# Yalnızca çalışma zamanı için gereken sistem kütüphaneleri (derleme araçları hariç)
+# ve önceki aşamada hazırlanmış virtualenv kopyalanır; bu imaj daha küçük ve daha güvenlidir.
+FROM python:3.11-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+
+# Tesseract OCR, Türkçe dil paketi, OpenCV runtime bağımlılıkları ve Poppler
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-tur \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     poppler-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Bağımlılıkları kopyala ve kur
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+COPY --from=builder /opt/venv /opt/venv
 
-# Uygulama dosyalarını kopyala
 COPY app.py .
 COPY Proje/ ./Proje/
+COPY tessdata/ ./tessdata/
 
-# Portu dışarı aç
+RUN useradd --create-home --shell /bin/bash appuser && \
+    mkdir -p /app/uploads && \
+    chown -R appuser:appuser /app
+USER appuser
+
 EXPOSE 5000
 
-# Gunicorn ile uygulamayı başlat
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "app:app"]
