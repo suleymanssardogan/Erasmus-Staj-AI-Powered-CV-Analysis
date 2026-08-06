@@ -260,11 +260,37 @@
         .webhook-advanced summary::-webkit-details-marker { display: none; }
 
         ::-webkit-scrollbar-thumb { border-radius: var(--radius-sm) !important; }
+
+        /* Print / PDF report output */
+        @media print {
+            body, body.dark-mode {
+                --bg-primary: #ffffff !important;
+                --bg-secondary: #ffffff !important;
+                --bg-tertiary: #f4f4f5 !important;
+                --text-primary: #09090b !important;
+                --text-secondary: #3f3f46 !important;
+                --border-color: #d4d4d8 !important;
+                --accent-purple: #09090b !important;
+            }
+            .no-print { display: none !important; }
+            .workspace-container { margin: 0 !important; max-width: 100% !important; }
+            .flow-card, .results-section {
+                box-shadow: none !important;
+                border: 1px solid #d4d4d8 !important;
+                page-break-inside: avoid;
+            }
+            details:not([open]) > *:not(summary) {
+                display: block !important;
+                content-visibility: visible !important;
+            }
+            summary { pointer-events: none; }
+            summary::-webkit-details-marker { display: none !important; }
+        }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar">
+    <nav class="navbar no-print">
         <div class="nav-container">
             <a href="/" class="nav-logo">
                 <span class="logo-dot"></span>
@@ -297,7 +323,7 @@
 
         <div class="flow-container">
             <!-- 1. Upload -->
-            <div class="upload-section flow-card">
+            <div class="upload-section flow-card no-print">
                 <h2 class="section-title">
                     <span class="section-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="M12 15V3"/><polyline points="7 8 12 3 17 8"/><line x1="5" y1="21" x2="19" y2="21"/></svg></span>
                     CV Yükle
@@ -353,10 +379,10 @@
             </div>
 
             <!-- Progress / Status -->
-            <div id="progressBar" class="progress-bar">
+            <div id="progressBar" class="progress-bar no-print">
                 <div id="progressFill" class="progress-fill"></div>
             </div>
-            <div id="statusMessage" class="status-message"></div>
+            <div id="statusMessage" class="status-message no-print"></div>
 
             <!-- Results (hidden until a document is analyzed) -->
             <div id="resultsWrapper" style="display: none;">
@@ -368,7 +394,7 @@
                         <div id="resultArea" class="result-placeholder">
                             Henüz bir özgeçmiş analiz edilmedi.
                         </div>
-                        <div id="resultActions" class="action-buttons" style="display: none; margin-top: 12px;">
+                        <div id="resultActions" class="action-buttons no-print" style="display: none; margin-top: 12px;">
                             <button type="button" class="btn btn-primary" onclick="copyText()"><span><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/></svg></span> Metni Kopyala</button>
                             <button type="button" class="btn btn-secondary" onclick="downloadText()"><span><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/></svg></span> İndir</button>
                         </div>
@@ -430,6 +456,11 @@
                 <!-- 5. ATS score + advice -->
                 <div class="results-section flow-card">
                     <h2 class="section-title"><span class="section-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg></span> ATS Skoru & Tavsiyeler</h2>
+                    <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                        <button type="button" class="btn btn-secondary" onclick="downloadReport()">
+                            <span><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/></svg></span> Raporu PDF Olarak İndir
+                        </button>
+                    </div>
                     <div class="ats-container">
                         <div class="ats-score-header">
                             <div class="ats-circle-progress">
@@ -482,8 +513,8 @@
                 <div class="results-section flow-card">
                     <h2 class="section-title"><span class="section-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Pozisyon Uyumu</h2>
                     <div class="role-matcher-container">
-                        <p class="role-desc">Özgeçmişinizin belirli bir pozisyonla anahtar kelime uyumunu görün.</p>
-                        <div class="form-group">
+                        <p class="role-desc no-print">Özgeçmişinizin belirli bir pozisyonla anahtar kelime uyumunu görün.</p>
+                        <div class="form-group no-print">
                             <label for="targetRoleSelect">Hedef Pozisyon</label>
                             <select id="targetRoleSelect" class="form-select" onchange="calculateRoleMatch()">
                                 <option value="python_dev">Python Developer</option>
@@ -517,7 +548,7 @@
                 </div>
 
                 <!-- 7. n8n webhook -->
-                <div class="results-section flow-card">
+                <div class="results-section flow-card no-print">
                     <h2 class="section-title"><span class="section-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> n8n Otomasyonu</h2>
                     <div class="webhook-inline">
                         <p>Çıkarılan veriyi tek tıkla n8n webhook'una gönderin.</p>
@@ -539,7 +570,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer no-print">
         <div class="footer-container" style="justify-content: center; padding: 20px 24px;">
             <p>&copy; 2026 AI CV Analyzer & OCR Pipeline. Tüm Hakları Saklıdır.</p>
         </div>

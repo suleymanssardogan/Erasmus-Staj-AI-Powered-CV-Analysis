@@ -528,6 +528,27 @@ async function sendToWebhook() {
     }
 }
 
+// Export the analysis results (extracted text, detected fields, ATS score, role match)
+// as a PDF via the browser's native print dialog ("Save as PDF"). No server round-trip needed.
+let reopenAfterPrint = [];
+function downloadReport() {
+    if (!processedText) {
+        showStatus('Rapor oluşturmak için önce bir CV analiz edin.', 'error');
+        return;
+    }
+
+    // Expand any collapsed <details> panels so their content is part of the printed page
+    reopenAfterPrint = Array.from(document.querySelectorAll('#resultsWrapper details:not([open])'));
+    reopenAfterPrint.forEach(d => { d.open = true; });
+
+    window.print();
+}
+
+window.addEventListener('afterprint', () => {
+    reopenAfterPrint.forEach(d => { d.open = false; });
+    reopenAfterPrint = [];
+});
+
 // Clear all inputs & analysis panels
 function clearAll() {
     fileInput.value = '';
@@ -1098,6 +1119,7 @@ window.copyText = copyText;
 window.downloadText = downloadText;
 window.clearAll = clearAll;
 window.sendToWebhook = sendToWebhook;
+window.downloadReport = downloadReport;
 window.loadHistoryItem = loadHistoryItem;
 window.googleSignIn = googleSignIn;
 window.logoutUser = logoutUser;
