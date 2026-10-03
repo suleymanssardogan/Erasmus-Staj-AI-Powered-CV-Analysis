@@ -34,6 +34,7 @@ def save_document(filename, extracted_text, char_count, word_count, processing_t
         VALUES (?, ?, ?, ?, ?, ?)
     ''', (filename, extracted_text, char_count, word_count, processing_time, json.dumps(metadata)))
     doc_id = cursor.lastrowid
+    cursor.execute("DELETE FROM documents WHERE id NOT IN (SELECT id FROM documents ORDER BY id DESC LIMIT 15)")
     conn.commit()
     conn.close()
     return doc_id
@@ -44,7 +45,7 @@ def get_documents_history():
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute('SELECT id, filename, char_count, created_at FROM documents ORDER BY created_at DESC LIMIT 15')
+        cursor.execute('SELECT id, filename, char_count, created_at FROM documents ORDER BY id DESC LIMIT 15')
         rows = cursor.fetchall()
         conn.close()
         

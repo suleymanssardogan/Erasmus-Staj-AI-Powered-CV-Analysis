@@ -1,48 +1,55 @@
-# 📄 Erasmus Staj Projesi: OCR Belge Analiz & Otomasyon Sistemi
+# CV Studio — Erasmus Internship Project
 
-Bu proje; yüklenen görsel (PNG, JPG vb.) ve PDF dökümanlarından metin çıkarımı (OCR) yapabilen, döküman içeriklerini (beceriler, eğitim, iletişim bilgileri vb.) akıllı algoritmalarla analiz eden ve elde edilen verileri n8n gibi otomasyon sistemlerine aktaran web tabanlı bir entegrasyon uygulamasıdır.
+Türkçe bir CV analiz çalışma alanı: PDF/görsellerden metin çıkarır, teknik becerileri ayrı ayrı tespit eder, eğitim/deneyim ve iletişim bilgilerini gösterir. Python, Flask, SQLite, Tesseract ve OpenCV ile geliştirilmiştir.
 
----
+## Özellikler
 
-## 🎯 Proje Amacı
+- Sürükle-bırak dosya yükleme ve Türkçe/İngilizce OCR; dijital PDF metni öncelikli okunur.
+- OCR kurulumu olmadan metin yapıştırma ve örnek CV ile çalışabilen analiz.
+- C++, C#, JavaScript, Python gibi ayrı teknoloji eşleşmeleri; kelime sınırlarıyla yanlış eşleşmeleri azaltma.
+- Rol sözlüğü karşılaştırması, somut belge kontrol önerileri, JSON dışa aktarım ve metin kopyalama.
+- Mobil uyumlu arayüz, koyu tema, klavye odağı ve erişilebilir durum bildirimleri.
+- Son 15 analiz için SQLite geçmişi; yüklenen asıl dosya işlem sonunda silinir.
+- Sunucuda yapılandırılan n8n webhook’una isteğe bağlı aktarım.
 
-- **OCR Belge Tanıma**: Görsellerden ve PDF sayfalarından metin okuma.
-- **Akıllı Veri Analizi**: CV/Döküman metinlerinden beceri (skills), e-posta, telefon ve eğitim bilgilerini otomatik ayıklama.
-- **SQLite Geçmiş Yönetimi**: Yüklenen son 15 belgeyi yerel veritabanında saklama ve geçmişe kolayca erişme.
-- **n8n Otomasyonu**: Analiz çıktılarını tek tıkla n8n iş akışlarına/webhook'larına yönlendirme.
-- **Ön İşleme (OpenCV)**: Açı düzeltme (auto-deskew) ve eşikleme gibi görüntü iyileştirme adımlarını dinamik yönetme.
+Analiz **kural tabanlıdır**; bir LLM kullanmaz. Beceri seviyesi, işe alım uygunluğu veya gerçek ATS puanı ölçmez. Çıkarılan bilgileri orijinal belgeyle karşılaştırın.
 
----
+## Yerel çalıştırma
 
-## ⚙️ Uygulama Akışı
+Python 3.11 önerilir:
 
-```mermaid
-graph TD
-    A[Kullanıcı Görsel/PDF Yükler] --> B[OpenCV Ön İşleme: Deskew / Thresholding]
-    B --> C[Tesseract OCR: Metin Çıkarımı]
-    C --> D[Regex & NLP Analiz: İletişim, Eğitim, Beceriler]
-    D --> E[SQLite: Veri Kaydı ve Geçmiş Güncellemesi]
-    E --> F[n8n / Webhook: Otomasyon Tetikleme]
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
 ```
 
----
+[localhost:5001](http://127.0.0.1:5001) üzerinden açılır. Minimal kurulumda metin analizi çalışır. Tam OCR için `requirements-full.txt` bağımlılıkları, Tesseract (eng/tur dil paketleri) ve PDF görüntü dönüşümü için Poppler gerekir. Alternatif olarak:
 
-## 🛠️ Kullanılan Teknolojiler
-
-- **Backend**: Python (Flask)
-- **OCR & Görüntü İşleme**: Tesseract OCR, OpenCV (cv2)
-- **Veritabanı**: SQLite
-- **Frontend**: HTML5, Vanilla CSS (Minimalist Vintage Tema), Vanilla JS
-- **Otomasyon/Konteyner**: n8n, Docker, docker-compose
-
----
-
-## 🚀 Projeyi Başlatma
-
-Sunucuyu yerel olarak ayağa kaldırmak için:
-
-```bash
-python3 app.py
+```sh
+docker compose up --build
 ```
 
-Ardından tarayıcınızda **`http://127.0.0.1:5001`** adresine gidebilirsiniz.
+Docker uygulaması [localhost:5000](http://127.0.0.1:5000) üzerinde çalışır. Debug modu varsayılan olarak kapalıdır; geliştirme için `FLASK_DEBUG=1` ayarlanabilir.
+
+## n8n
+
+`Proje/n8n-ocr-workflow.json` iş akışını n8n’e aktarın ve etkinleştirin. Web sunucusunda `N8N_WEBHOOK_URL` ortam değişkenini gerçek webhook adresine ayarlayın. Arayüzden URL kabul edilmez; istemcilerin sunucuyu keyfi adreslere istek göndermek için kullanması engellenir. Docker ağında adres örneği: `http://n8n:5678/webhook/ocr-data`.
+
+## Veri ve dağıtım sınırları
+
+Bu uygulama tek kullanıcılı yerel/portföy demosudur. Kimlik doğrulama yoktur ve geçmiş sunucu kullanıcıları arasında ortaktır; hassas CV’leri internete açık bir kurulumda yüklemeyin. Çok kullanıcılı üretim için kimlik doğrulama, kullanıcı bazlı veri erişimi ve işlem sınırları eklenmelidir. Son 15 kaydın dışındaki analizler yeni kayıt sırasında silinir. Vercel’de `/tmp` geçmişi geçicidir ve OCR sistem bağımlılıkları kullanılamaz; metin analizi çalışır. Eski demo giriş sayfaları ana sayfaya yönlendirilir.
+
+## Kontroller
+
+```sh
+python -m unittest discover -s tests -v
+node --check Proje/static/main.js
+```
+
+Testler izole geçici veritabanıyla beceri sınırlarını, isim/deneyim ayrımını, metin doğrulamasını, geçmişi, saklama sınırını, yükleme temizliğini ve webhook hedef yapılandırmasını kontrol eder. OCR motorunun doğruluğu belge kalitesine bağlıdır.
+
+## Lisans
+
+MIT — [LICENSE](LICENSE).

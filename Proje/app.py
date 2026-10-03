@@ -4,6 +4,9 @@ import time
 import re
 import json
 import urllib.request
+import uuid
+import shutil
+from flask import redirect
 from werkzeug.utils import secure_filename
 
 from Proje.database import init_db, save_document, get_documents_history, get_document_by_id
@@ -19,7 +22,7 @@ try:
     from PIL import Image
     from pypdf import PdfReader
     from pdf2image import convert_from_path
-    OCR_AVAILABLE = True
+    OCR_AVAILABLE = bool(shutil.which("tesseract"))
 except ImportError:
     OCR_AVAILABLE = False
 
@@ -67,7 +70,7 @@ def extract_ner_entities(text):
     
     # 1. Kişi Varlıkları (Persons)
     persons = []
-    explicit_name_pattern = r'\b(?:adı?\s*soyadı?|name|candidate)\s*:\s*([A-ZÇĞİÖŞÜa-zçğıöşü\s]+)'
+    explicit_name_pattern = r'\b(?:adı?\s*soyadı?|name|candidate)\s*:\s*([A-ZÇĞİÖŞÜa-zçğıöşü \t]+)'
     explicit_match = re.search(explicit_name_pattern, text, re.IGNORECASE)
     if explicit_match:
         name = explicit_match.group(1).strip()
@@ -159,7 +162,7 @@ def get_best_ocr_lang():
     try:
         available_langs = pytesseract.get_languages()
         if 'tur' in available_langs:
-            return 'tur+eng'
+            return 'tur+eng' if 'eng' in available_langs else 'tur'
         return 'eng'
     except Exception:
         return 'eng'
@@ -199,25 +202,9 @@ def analyze_cv_content(text):
     text_lower = text.lower()
     
     # Beceriler (Skills) Tanımlamaları
-    skills_dict = {
-        "Python": r"\bpython\b",
-        "Java": r"\bjava\b(?!script)",
-        "C++": r"\bc\+\+\b",
-        "JavaScript / TypeScript": r"\bjavascript\b|\btypescript\b|\bjs\b|\bts\b",
-        "HTML / CSS": r"\bhtml\b|\bcss\b",
-        "React / Vue / Angular": r"\breact\b|\bvue\b|\bangular\b",
-        "Node.js / Django / Flask": r"\bnode\.js\b|\bnode\b|\bdjango\b|\bflask\b|\bfastapi\b",
-        "SQL / NoSQL": r"\bsql\b|\bpostgres\b|\bmysql\b|\bmongodb\b|\bnosql\b",
-        "Git": r"\bgit\b|\bgithub\b|\bgitlab\b",
-        "Docker / Kubernetes": r"\bdocker\b|\bkubernetes\b|\bk8s\b",
-        "Bulut Bilişim (Cloud)": r"\baws\b|\bazure\b|\bgcp\b",
-        "Otomasyon (n8n)": r"\bn8n\b",
-        "OpenCV": r"\bopencv\b",
-        "Yapay Zeka (AI / ML)": r"\bpytorch\b|\btensorflow\b|\bmachine learning\b|\byapay zeka\b|\bderin öğrenme\b",
-        "Office Programları": r"\bexcel\b|\bword\b|\boffice\b|\bpowerpoint\b",
-        "Proje Yönetimi / Agile": r"\bscrum\b|\bagile\b|\bkanban\b|\bproje yönetimi\b"
-    }
-    
+    technologies = ["Python", "Java", "C++", "C#", "JavaScript", "TypeScript", "HTML", "CSS", "React", "Vue", "Angular", "Node.js", "Django", "Flask", "FastAPI", "SQL", "PostgreSQL", "MySQL", "SQLite", "MongoDB", "Git", "GitHub", "Docker", "Kubernetes", "AWS", "Azure", "GCP", "n8n", "OpenCV", "PyTorch", "TensorFlow", "Excel", "Scrum", "Agile"]
+    skills_dict = {name: r"(?<!\w)" + re.escape(name.lower()) + r"(?!\w)" for name in technologies}
+
     found_skills = []
     for skill, pattern in skills_dict.items():
         if re.search(pattern, text_lower):
@@ -250,7 +237,7 @@ def analyze_cv_content(text):
         
         # Skorları hesapla
         edu_score = sum(1 for kw in education_keywords if kw in line_lower)
-        exp_score = sum(1 for kw in experience_keywords if kw in line_lower)
+        exp_score = sum(1 for kw in experience_keywords if re.search(r"(?<!\w)" + re.escape(kw) + r"(?!\w)", line_lower))
         
         # Güçlü belirteçler
         has_strong_edu = any(kw in line_lower for kw in ["student", "öğrenci", "üniversite", "universite", "university", "szkoła", "wsti", "college", "bachelor", "lisans"])
@@ -272,7 +259,7 @@ def analyze_cv_content(text):
                     found_experience.append(line_clean)
                     
     return {
-        "skills": found_skills[:15],
+        "skills": found_skills,
         "education": found_education[:5],
         "experience": found_experience[:8]
     }
@@ -377,12 +364,12 @@ def index():
 @app.route("/login")
 def login():
     """Giriş sayfası"""
-    return render_template("login.html")
+    return redirect("/")
 
 @app.route("/register")
 def register():
     """Kayıt sayfası"""
-    return render_template("register.html")
+    return redirect("/")
 
 @app.route("/test")
 def test():
@@ -399,6 +386,7 @@ def upload_file():
         }), 503
 
     start_time = time.time()
+    file_path = None
     try:
         # Dosya varlığını kontrol et
         if "file" not in request.files:
@@ -424,8 +412,8 @@ def upload_file():
             }), 400
         
         # Dosyayı kaydet
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filename = secure_filename(file.filename) or 'document.' + file.filename.rsplit('.', 1)[1].lower()
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], uuid.uuid4().hex + '.' + file.filename.rsplit('.', 1)[1].lower())
         file.save(file_path)
         
         # En iyi dil seçeneğini al
@@ -443,6 +431,8 @@ def upload_file():
         else:
             extracted_text = extract_text_from_image(file_path, ocr_lang, binarization_mode, auto_deskew)
             
+        if not extracted_text.strip():
+            return jsonify(success=False, error="Okunabilir metin bulunamadı. Daha net bir dosya veya metin girişi kullanın."), 422
         processing_time = round(time.time() - start_time, 2)
         
         # Kaydedilen geçici dosyayı temizle (Opsiyonel: Eğer saklamak istemiyorsak)
@@ -480,6 +470,23 @@ def upload_file():
             "error": f"Sunucu hatası: {str(e)}"
         }), 500
 
+    finally:
+        if file_path and os.path.exists(file_path):
+            os.remove(file_path)
+
+@app.route("/api/analyze", methods=["POST"])
+def analyze_text():
+    data = request.get_json(silent=True)
+    text = data.get("text") if isinstance(data, dict) else None
+    if not isinstance(text, str) or not 20 <= len(text.strip()) <= 100000:
+        return jsonify(success=False, error="20–100.000 karakter arasında bir CV metni girin."), 400
+    text = text.strip()
+    metadata = extract_metadata(text)
+    metadata["cv_analysis"] = analyze_cv_content(text)
+    save_document("Metin analizi", text, len(text), len(text.split()), 0, metadata)
+    return jsonify(success=True, filename="Metin analizi", extracted_text=text,
+                   char_count=len(text), word_count=len(text.split()), processing_time=0, metadata=metadata)
+
 @app.route("/api/send_webhook", methods=["POST"])
 def send_webhook():
     """Çıkarılan veriyi n8n veya belirtilen custom webhook'a yönlendirir"""
@@ -488,7 +495,9 @@ def send_webhook():
         if not data:
             return jsonify({"success": False, "error": "Gönderilecek veri bulunamadı"}), 400
         
-        webhook_url = data.get("webhook_url")
+        webhook_url = os.environ.get("N8N_WEBHOOK_URL")
+        if not webhook_url:
+            return jsonify(success=False, error="Sunucuda N8N_WEBHOOK_URL yapılandırılmamış."), 503
         payload = data.get("payload")
         
         if not webhook_url or not payload:
@@ -504,7 +513,7 @@ def send_webhook():
         
         with urllib.request.urlopen(req, timeout=10) as response:
             resp_code = response.getcode()
-            resp_body = response.read().decode('utf-8')
+            resp_body = response.read(4096).decode('utf-8')
             
         return jsonify({
             "success": True,
@@ -573,4 +582,4 @@ if __name__ == '__main__':
     print("🚀 OCR Belge Sistemi başlatılıyor...")
     print(f"📁 Upload klasörü: {UPLOAD_FOLDER}")
     print(f"📋 Desteklenen formatlar: {', '.join(ALLOWED_EXTENSIONS)}")
-    app.run(debug=True, port=5001)
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1", port=5001)
