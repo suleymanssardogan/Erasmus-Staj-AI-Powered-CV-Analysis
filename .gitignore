@@ -20,3 +20,8 @@ uploads/
 
 # Nested git projects
 Erasmus-Staj-AI-Powered-CV-Analysis/
+
+.session-key
+.env
+output/
+tmp/pdfs/

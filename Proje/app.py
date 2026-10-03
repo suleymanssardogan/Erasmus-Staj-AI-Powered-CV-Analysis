@@ -7,9 +7,11 @@ import urllib.request
 import uuid
 import shutil
 from flask import redirect
+import secrets
+from werkzeug.security import generate_password_hash
+from Proje.features import features, enrich, save_private, csrf
 from werkzeug.utils import secure_filename
 
-from Proje.database import init_db, save_document, get_documents_history, get_document_by_id
 
 # OCR bağımlılıkları (Tesseract/OpenCV/Poppler) yalnızca sistem kütüphaneleriyle birlikte
 # kurulu ortamlarda (Docker imajı, yerel kurulum) mevcuttur. Bu paketler olmadan da uygulamanın
@@ -20,16 +22,38 @@ try:
     import numpy as np
     import pytesseract
     from PIL import Image
-    from pypdf import PdfReader
     from pdf2image import convert_from_path
     OCR_AVAILABLE = bool(shutil.which("tesseract"))
 except ImportError:
     OCR_AVAILABLE = False
 
+try:
+    from pypdf import PdfReader
+except ImportError:
+    PdfReader = None
+
 # Vercel'in serverless çalışma zamanında dosya sistemi salt-okunurdur; /tmp dışına yazılamaz.
 IS_SERVERLESS = bool(os.environ.get("VERCEL"))
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY')
+if not app.secret_key and not IS_SERVERLESS:
+    key_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.session-key')
+    if not os.path.exists(key_path):
+        with open(key_path, 'w') as key_file:
+            key_file.write(secrets.token_urlsafe(48))
+        os.chmod(key_path, 0o600)
+    with open(key_path) as key_file:
+        app.secret_key = key_file.read().strip()
+# Guest analysis remains usable when account infrastructure isn't configured.
+# A process-local key cannot enable persistent serverless accounts.
+if not app.secret_key:
+    app.secret_key = secrets.token_urlsafe(48)
+app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax',
+                  SESSION_COOKIE_SECURE=IS_SERVERLESS,
+                  DUMMY_PASSWORD_HASH=generate_password_hash('invalid-password', method='pbkdf2:sha256:600000'))
+app.register_blueprint(features)
+app.before_request(csrf)
 UPLOAD_FOLDER = "/tmp/uploads" if IS_SERVERLESS else "uploads"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'pdf'}
 
@@ -37,7 +61,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
 # Veritabanını ve Upload klasörünü başlat
-init_db()
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 if OCR_AVAILABLE:
@@ -327,7 +351,11 @@ def extract_text_from_pdf(pdf_path, lang, binarization_mode="otsu", auto_deskew=
     """PDF dosyasından metin çıkarır. Seçilebilir metin yoksa OCR yapar."""
     text = ""
     try:
+        if PdfReader is None:
+            return ''
         reader = PdfReader(pdf_path)
+        if reader.is_encrypted or len(reader.pages)>20:
+            return ''
         for page in reader.pages:
             page_text = page.extract_text()
             if page_text:
@@ -338,8 +366,10 @@ def extract_text_from_pdf(pdf_path, lang, binarization_mode="otsu", auto_deskew=
     except Exception as e:
         print(f"Dijital PDF metin okuma başarısız oldu, OCR deneniyor: {e}")
     
+    if not OCR_AVAILABLE:
+        return text.strip()
     try:
-        pages = convert_from_path(pdf_path, dpi=150)
+        pages = convert_from_path(pdf_path, dpi=150, last_page=20)
         ocr_text = []
         for i, page in enumerate(pages):
             temp_page_path = f"{pdf_path}_page_{i}.png"
@@ -378,13 +408,6 @@ def test():
 @app.route("/api/ocr", methods=["POST"])
 def upload_file():
     """Dosya yükleme ve OCR işlemi"""
-    if not OCR_AVAILABLE:
-        return jsonify({
-            "success": False,
-            "error": "OCR analizi bu dağıtımda devre dışı (Tesseract/OpenCV/Poppler gerektirir). "
-                     "Tam özellikli sürüm için projenin Docker imajını çalıştırın."
-        }), 503
-
     start_time = time.time()
     file_path = None
     try:
@@ -426,6 +449,8 @@ def upload_file():
         # Dosya uzantısına göre işlem yap
         file_ext = filename.rsplit('.', 1)[1].lower()
         
+        if file_ext != 'pdf' and not OCR_AVAILABLE:
+            return jsonify(success=False, error='Bu ortamda görseli tarayıcı OCR ile analiz edin.'), 503
         if file_ext == 'pdf':
             extracted_text = extract_text_from_pdf(file_path, ocr_lang, binarization_mode, auto_deskew)
         else:
@@ -443,17 +468,8 @@ def upload_file():
         cv_analysis = analyze_cv_content(extracted_text)
         metadata["cv_analysis"] = cv_analysis
         
-        # Veritabanına kaydet
-        save_document(
-            filename=filename,
-            extracted_text=extracted_text,
-            char_count=len(extracted_text),
-            word_count=len(extracted_text.split()) if extracted_text else 0,
-            processing_time=processing_time,
-            metadata=metadata
-        )
-        
-        return jsonify({
+        metadata = enrich(extracted_text, metadata)
+        return jsonify(save_private({
             "success": True,
             "message": "OCR işlemi başarıyla tamamlandı ve kaydedildi",
             "filename": filename,
@@ -462,12 +478,12 @@ def upload_file():
             "word_count": len(extracted_text.split()) if extracted_text else 0,
             "processing_time": processing_time,
             "metadata": metadata
-        }), 200
+        })), 200
         
     except Exception as e:
         return jsonify({
             "success": False,
-            "error": f"Sunucu hatası: {str(e)}"
+            "error": "Belge işlenemedi. Dosyanın geçerli ve okunabilir olduğunu kontrol edin."
         }), 500
 
     finally:
@@ -483,9 +499,17 @@ def analyze_text():
     text = text.strip()
     metadata = extract_metadata(text)
     metadata["cv_analysis"] = analyze_cv_content(text)
-    save_document("Metin analizi", text, len(text), len(text.split()), 0, metadata)
-    return jsonify(success=True, filename="Metin analizi", extracted_text=text,
-                   char_count=len(text), word_count=len(text.split()), processing_time=0, metadata=metadata)
+    job = data.get('job', '')
+    excluded = data.get('excluded', [])
+    from Proje.features import TECHNOLOGIES
+    if not isinstance(job, str) or len(job)>30000 or not isinstance(excluded,list) or any(s not in TECHNOLOGIES for s in excluded):
+        return jsonify(success=False,error='Geçersiz ilan veya beceri seçimi.'),400
+    metadata = enrich(text, metadata, job, excluded)
+    filename = data.get('filename','Metin analizi')
+    if not isinstance(filename,str) or len(filename)>255:
+        return jsonify(success=False,error='Geçersiz belge adı.'),400
+    return jsonify(save_private(dict(success=True, filename=filename, extracted_text=text,
+                   char_count=len(text), word_count=len(text.split()), processing_time=0, metadata=metadata)))
 
 @app.route("/api/send_webhook", methods=["POST"])
 def send_webhook():
@@ -527,28 +551,10 @@ def send_webhook():
             "error": f"Webhook gönderme hatası: {str(e)}"
         }), 500
 
-@app.route("/api/history", methods=["GET"])
-def get_history():
-    """Son yüklenen belgelerin geçmişini döndürür"""
-    history = get_documents_history()
-    return jsonify({
-        "success": True,
-        "history": history
-    }), 200
-
-@app.route("/api/history/<int:doc_id>", methods=["GET"])
-def get_document_details(doc_id):
-    """Belirli bir belgenin detaylarını döndürür"""
-    doc = get_document_by_id(doc_id)
-    if not doc:
-        return jsonify({
-            "success": False,
-            "error": "Belge bulunamadı"
-        }), 404
-    return jsonify({
-        "success": True,
-        "document": doc
-    }), 200
+@app.route('/api/history')
+@app.route('/api/history/<int:doc_id>')
+def retired_history(doc_id=None):
+    return jsonify(success=False, error='Ortak geçmiş kapatıldı. Kullanıcıya özel geçmiş için giriş yapın.'), 410
 
 @app.route("/api/health", methods=["GET"])
 def health_check():
@@ -557,6 +563,7 @@ def health_check():
         "status": "healthy",
         "message": "OCR Sistemi çalışıyor" if OCR_AVAILABLE else "Sistem çalışıyor (bu dağıtımda OCR devre dışı)",
         "ocr_available": OCR_AVAILABLE,
+        "pdf_available": PdfReader is not None,
         "upload_folder": UPLOAD_FOLDER,
         "allowed_extensions": list(ALLOWED_EXTENSIONS),
         "tesseract_lang": get_best_ocr_lang()

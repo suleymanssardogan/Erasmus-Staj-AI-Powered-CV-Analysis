@@ -1,202 +1,343 @@
 <!doctype html>
 <html lang="tr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="CV metnini, becerilerini ve deneyimini inceleyen OCR çalışma alanı.">
-<title>CV Studio · Erasmus projesi</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-<a class="skip" href="#workspace">İçeriğe geç</a>
-<header>
-<a class="brand" href="/">cv<span>studio</span>
-<small>ERASMUS LAB</small>
-</a>
-<div class="header-right">
-<span id="health">Sistem kontrol ediliyor</span>
-<button id="theme" aria-label="Renk temasını değiştir">◐</button>
-</div>
-</header>
-<main id="workspace">
-<section class="hero">
-<p class="eyebrow">BELGEDEN İÇGÖRÜYE</p>
-<h1>Deneyimini görünür kıl.</h1>
-<p>CV’ndeki becerileri, eğitim ve deneyim bilgilerini tek bir yerde incele. Sonuçları gözden geçir, sonraki adımını belirle.</p>
-<div class="steps">
-<span>
-<b>01</b> CV’ni ekle</span>
-<span>
-<b>02</b> Bilgileri keşfet</span>
-<span>
-<b>03</b> Raporunu al</span>
-</div>
-</section>
-<div class="workspace">
-<aside>
-<section class="card">
-<div class="card-heading">
-<h2>Yeni analiz</h2>
-<span class="label">16 MB’a kadar</span>
-</div>
-<div class="tabs" role="group" aria-label="Girdi türü">
-<button id="fileTab" class="active" aria-pressed="true">Dosya yükle</button>
-<button id="textTab" aria-pressed="false">Metin yapıştır</button>
-</div>
-<div id="filePanel">
-<label class="drop" id="drop" for="file">
-<span class="upload-symbol">↑</span>
-<strong id="fileName">CV’ni buraya bırak</strong>
-<span>veya dosya seçmek için tıkla</span>
-<small>PDF, PNG, JPG, GIF, BMP, TIFF</small>
-<input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.tiff">
-</label>
-<details>
-<summary>Görüntü işleme ayarları</summary>
-<label class="field">Eşikleme<select id="binarization">
-<option value="otsu">Otomatik (Otsu)</option>
-<option value="adaptive">Uyarlanabilir</option>
-<option value="none">Gri tonlama</option>
-</select>
-</label>
-<label>
-<input id="deskew" type="checkbox"> Eğik görüntüyü düzelt</label>
-</details>
-</div>
-<div id="textPanel" hidden>
-<label class="field" for="text">CV metni<textarea id="text" rows="10" maxlength="100000" placeholder="CV’ndeki metni buraya yapıştır…">
-</textarea>
-</label>
-<button class="subtle" id="sample">Örnek CV ile dene ↗</button>
-</div>
-<button class="primary" id="analyze">CV’yi analiz et <span>→</span>
-</button>
-<p class="privacy">Dosyalar işlemden sonra silinir. Analiz metni bu sunucunun son 15 kayıtlık ortak geçmişinde saklanır. Hassas bilgileri kaldırarak deneyebilirsin.</p>
-<p id="status" role="status" aria-live="polite">
-</p>
-</section>
-<section class="card history">
-<div class="card-heading">
-<h2>Son analizler</h2>
-<button id="refresh" class="subtle" aria-label="Geçmişi yenile">↻</button>
-</div>
-<div id="history">Yükleniyor…</div>
-</section>
-<p class="aside-note">Erasmus staj projesi<br>Python · Flask · Tesseract · OpenCV</p>
-</aside>
-<section class="results" aria-label="Analiz sonuçları">
-<div id="empty" class="card empty">
-<div class="document-art" aria-hidden="true">
-<span>CV</span>
-<i>
-</i>
-<i>
-</i>
-<i>
-</i>
-<div>✓</div>
-</div>
-<p class="eyebrow">BİR SONRAKİ ADIMIN</p>
-<h2>CV’ni daha yakından tanı.</h2>
-<p>Bir belge yükle veya metin yapıştır. Tespit edilen bilgiler ve geliştirme önerileri burada görünecek.</p>
-<div class="empty-features">
-<span>✦ Teknik beceriler</span>
-<span>↗ Rol anahtar kelimeleri</span>
-<span>☷ Metin çıkarımı</span>
-</div>
-</div>
-<div id="result" hidden>
-<section class="card">
-<div class="card-heading">
-<div>
-<p class="eyebrow">ANALİZ TAMAMLANDI</p>
-<h2 id="resultName">
-</h2>
-</div>
-<button id="export" class="subtle">JSON indir ↓</button>
-</div>
-<div class="stats">
-<div>
-<strong id="words">0</strong>
-<span>kelime</span>
-</div>
-<div>
-<strong id="skillCount">0</strong>
-<span>teknik beceri</span>
-</div>
-<div>
-<strong id="seconds">0</strong>
-<span>saniye</span>
-</div>
-</div>
-<p class="notice">Kural tabanlı çıkarım kullanılır. Sonuçlar beceri seviyesini veya işe uygunluğu kanıtlamaz; orijinal CV ile doğrula.</p>
-</section>
-<section class="card">
-<h2>Teknik beceriler</h2>
-<div id="skills" class="badges">
-</div>
-<div class="two-col">
-<div>
-<h3>Eğitim</h3>
-<ul id="education">
-</ul>
-</div>
-<div>
-<h3>Deneyim</h3>
-<ul id="experience">
-</ul>
-</div>
-</div>
-</section>
-<section class="card">
-<div class="card-heading">
-<h2>Rol anahtar kelimeleri</h2>
-<select id="role" aria-label="Hedef rol">
-<option value="backend">Backend developer</option>
-<option value="frontend">Frontend developer</option>
-<option value="data">Data scientist</option>
-</select>
-</div>
-<p id="match">
-</p>
-<h3>CV’de bulunanlar</h3>
-<div id="found" class="badges">
-</div>
-<h3>Metinde bulunmayanlar</h3>
-<div id="missing" class="badges muted">
-</div>
-<p class="privacy">Eksik kelimeler yalnızca bu rolün örnek sözlüğüne göre belirlenir. CV’ne sadece gerçekten sahip olduğun becerileri ekle.</p>
-</section>
-<section class="card">
-<h2>İletişim ve belge kontrolü</h2>
-<div id="contacts" class="badges">
-</div>
-<ul id="tips">
-</ul>
-</section>
-<section class="card">
-<div class="card-heading">
-<h2>Çıkarılan metin</h2>
-<button id="copy" class="subtle">Kopyala</button>
-</div>
-<pre id="extracted">
-</pre>
-</section>
-<section class="card">
-<div class="card-heading">
-<h2>Otomasyon</h2>
-<button id="webhook" class="subtle">n8n’e gönder ↗</button>
-</div>
-<p class="privacy">Sunucuda yapılandırılmış webhook’a analiz verisini gönderir.</p>
-</section>
-</div>
-</section>
-</div>
-</main>
-<footer>CV Studio <span>Erasmus stajından geliştirilen açık kaynak analiz çalışma alanı.</span>
-<a href="https://github.com/suleymanssardogan/Erasmus-Staj-AI-Powered-CV-Analysis" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-</footer>
-<script src="{{ url_for('static', filename='main.js') }}">
-</script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="CV metnini, becerilerini ve deneyimini inceleyen OCR çalışma alanı."
+    />
+    <title>CV Studio · Erasmus projesi</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <a class="skip" href="#workspace">İçeriğe geç</a>
+    <header>
+      <a class="brand" href="/"
+        >cv<span>studio</span>
+        <small>ERASMUS LAB</small>
+      </a>
+      <div class="header-right">
+        <button id="accountToggle" class="subtle">Hesabım</button>
+        <span id="health">Sistem kontrol ediliyor</span>
+        <button id="theme" aria-label="Renk temasını değiştir">◐</button>
+      </div>
+    </header>
+    <main id="workspace">
+      <section class="hero">
+        <p class="eyebrow">BELGEDEN İÇGÖRÜYE</p>
+        <h1>Deneyimini görünür kıl.</h1>
+        <p>
+          CV’ndeki becerileri, eğitim ve deneyim bilgilerini tek bir yerde
+          incele. Sonuçları gözden geçir, sonraki adımını belirle.
+        </p>
+        <div class="steps">
+          <span> <b>01</b> CV’ni ekle</span>
+          <span> <b>02</b> Bilgileri keşfet</span>
+          <span> <b>03</b> Raporunu al</span>
+        </div>
+      </section>
+      <div class="workspace">
+        <aside>
+          <section class="card" id="accountPanel" hidden>
+            <h2>Özel çalışma alanın</h2>
+            <p id="accountNote" class="privacy">
+              Hesap durumu kontrol ediliyor…
+            </p>
+            <form id="authForm">
+              <label class="field"
+                >E-posta<input
+                  id="email"
+                  type="email"
+                  autocomplete="username"
+                  required
+                  maxlength="254"
+              /></label>
+              <label class="field"
+                >Parola<input
+                  id="password"
+                  type="password"
+                  autocomplete="current-password"
+                  minlength="10"
+                  maxlength="128"
+                  required
+              /></label>
+              <div class="card-heading">
+                <button type="submit" class="subtle" id="login">
+                  Giriş yap</button
+                ><button type="submit" class="subtle" id="register">
+                  Kayıt ol
+                </button>
+              </div>
+            </form>
+            <div id="accountSettings" hidden>
+              <label class="field"
+                >Saklama süresi<select id="retention">
+                  <option value="7">7 gün</option>
+                  <option value="30">30 gün</option>
+                  <option value="90">90 gün</option>
+                </select></label
+              >
+              <p class="privacy">
+                Kısaltma mevcut kayıtların kalan süresini de sınırlar. Süresi
+                dolan analizler geri getirilemez.
+              </p>
+              <button class="subtle" id="logout">Çıkış yap</button>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-heading">
+              <h2>Yeni analiz</h2>
+              <span class="label">16 MB’a kadar</span>
+            </div>
+            <div class="tabs" role="group" aria-label="Girdi türü">
+              <button id="fileTab" class="active" aria-pressed="true">
+                Dosya yükle
+              </button>
+              <button id="textTab" aria-pressed="false">Metin yapıştır</button>
+            </div>
+            <div id="filePanel">
+              <label class="drop" id="drop" for="file">
+                <span class="upload-symbol">↑</span>
+                <strong id="fileName">CV’ni buraya bırak</strong>
+                <span>veya dosya seçmek için tıkla</span>
+                <small>PDF, PNG, JPG, GIF, BMP</small>
+                <input
+                  id="file"
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp"
+                />
+              </label>
+              <details>
+                <summary>Görüntü işleme ayarları</summary>
+                <label class="field"
+                  >Eşikleme<select id="binarization">
+                    <option value="otsu">Otomatik (Otsu)</option>
+                    <option value="adaptive">Uyarlanabilir</option>
+                    <option value="none">Gri tonlama</option>
+                  </select>
+                </label>
+                <label>
+                  <input id="deskew" type="checkbox" /> Eğik görüntüyü
+                  düzelt</label
+                >
+              </details>
+            </div>
+            <div id="textPanel" hidden>
+              <label class="field" for="text"
+                >CV metni<textarea
+                  id="text"
+                  rows="10"
+                  maxlength="100000"
+                  placeholder="CV’ndeki metni buraya yapıştır…"
+                ></textarea>
+              </label>
+              <button class="subtle" id="sample">Örnek CV ile dene ↗</button>
+            </div>
+            <button class="primary" id="analyze">
+              CV’yi analiz et <span>→</span>
+            </button>
+            <p class="privacy">
+              Dosya tarayıcında okunur; çıkarılan metin analiz için sunucuya
+              gönderilir. Misafir analizleri saklanmaz. Giriş yaparsan geçmişin
+              yalnızca hesabına kaydedilir. OCR bileşenleri ilk kullanımda
+              indirilir.
+            </p>
+            <p id="status" role="status" aria-live="polite"></p>
+          </section>
+          <section class="card history">
+            <div class="card-heading">
+              <h2>Özel geçmişim</h2>
+              <button id="refresh" class="subtle" aria-label="Geçmişi yenile">
+                ↻
+              </button>
+            </div>
+            <div id="history">Yükleniyor…</div>
+          </section>
+          <p class="aside-note">
+            Erasmus staj projesi<br />Python · Flask · Tesseract · OpenCV
+          </p>
+        </aside>
+        <section class="results" aria-label="Analiz sonuçları">
+          <div id="empty" class="card empty">
+            <div class="document-art" aria-hidden="true">
+              <span>CV</span>
+              <i> </i>
+              <i> </i>
+              <i> </i>
+              <div>✓</div>
+            </div>
+            <p class="eyebrow">BİR SONRAKİ ADIMIN</p>
+            <h2>CV’ni daha yakından tanı.</h2>
+            <p>
+              Bir belge yükle veya metin yapıştır. Tespit edilen bilgiler ve
+              geliştirme önerileri burada görünecek.
+            </p>
+            <div class="empty-features">
+              <span>✦ Teknik beceriler</span>
+              <span>↗ Rol anahtar kelimeleri</span>
+              <span>☷ Metin çıkarımı</span>
+            </div>
+          </div>
+          <div id="result" hidden>
+            <section class="card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">ANALİZ TAMAMLANDI</p>
+                  <h2 id="resultName"></h2>
+                </div>
+                <div class="report-actions">
+                  <button id="pdfReport" class="subtle">PDF raporu ↓</button
+                  ><button id="export" class="subtle">JSON ↓</button>
+                </div>
+              </div>
+              <div class="stats">
+                <div>
+                  <strong id="words">0</strong>
+                  <span>kelime</span>
+                </div>
+                <div>
+                  <strong id="skillCount">0</strong>
+                  <span>teknik beceri</span>
+                </div>
+                <div>
+                  <strong id="seconds">0</strong>
+                  <span>saniye</span>
+                </div>
+              </div>
+              <p class="notice">
+                Kural tabanlı çıkarım kullanılır. Sonuçlar beceri seviyesini
+                veya işe uygunluğu kanıtlamaz; orijinal CV ile doğrula.
+              </p>
+            </section>
+            <section class="card">
+              <h2>Teknik beceriler</h2>
+              <div id="skills" class="badges"></div>
+              <div id="skillEvidence" class="evidence-list"></div>
+              <p class="privacy">
+                Yanlış tespiti hariç tutabilirsin. Kaynak cümleleri orijinal CV
+                ile kontrol et. Düzeltmeler rapora ve ilan karşılaştırmasına
+                uygulanır.
+              </p>
+              <div class="two-col">
+                <div>
+                  <h3>Eğitim</h3>
+                  <ul id="education"></ul>
+                </div>
+                <div>
+                  <h3>Deneyim</h3>
+                  <ul id="experience"></ul>
+                </div>
+              </div>
+            </section>
+            <section class="card">
+              <div class="card-heading">
+                <h2>Rol anahtar kelimeleri</h2>
+                <select id="role" aria-label="Hedef rol">
+                  <option value="backend">Backend developer</option>
+                  <option value="frontend">Frontend developer</option>
+                  <option value="data">Data scientist</option>
+                </select>
+              </div>
+              <p id="match"></p>
+              <h3>CV’de bulunanlar</h3>
+              <div id="found" class="badges"></div>
+              <h3>Metinde bulunmayanlar</h3>
+              <div id="missing" class="badges muted"></div>
+              <p class="privacy">
+                Eksik kelimeler yalnızca bu rolün örnek sözlüğüne göre
+                belirlenir. CV’ne sadece gerçekten sahip olduğun becerileri
+                ekle.
+              </p>
+            </section>
+            <section class="card">
+              <h2>İş ilanıyla karşılaştır</h2>
+              <label class="field" for="job"
+                >İlan metni<textarea
+                  id="job"
+                  rows="6"
+                  maxlength="30000"
+                  placeholder="İş ilanının gereksinimlerini yapıştır…"
+                ></textarea>
+              </label>
+              <button id="compareJob" class="subtle">
+                Gereksinimleri karşılaştır →
+              </button>
+              <div id="jobResult" aria-live="polite"></div>
+            </section>
+            <section class="card">
+              <h2>CV sürümlerini karşılaştır</h2>
+              <label class="field"
+                >Önceki analiz<select id="previousVersion">
+                  <option value="">Geçmişten seç veya aşağıya yapıştır</option>
+                </select></label
+              >
+              <label class="field" for="oldCV"
+                >Önceki CV metni<textarea
+                  id="oldCV"
+                  rows="5"
+                  maxlength="100000"
+                  placeholder="Eski CV metnini yapıştır…"
+                ></textarea>
+              </label>
+              <p class="privacy">
+                Açık analiz yeni sürüm olarak kullanılır. Metindeki
+                değişiklikler, beceri ekleme ve çıkarmalar gösterilir.
+              </p>
+              <button id="compareVersions" class="subtle">
+                Sürümleri karşılaştır →
+              </button>
+              <div id="versionResult" aria-live="polite"></div>
+            </section>
+            <section class="card">
+              <h2>İletişim ve belge kontrolü</h2>
+              <div id="contacts" class="badges"></div>
+              <ul id="tips"></ul>
+            </section>
+            <section class="card">
+              <div class="card-heading">
+                <h2>Çıkarılan metin</h2>
+                <button id="copy" class="subtle">Kopyala</button>
+              </div>
+              <label class="field" for="extracted"
+                >Metni düzelt<textarea
+                  id="extracted"
+                  rows="9"
+                  maxlength="100000"
+                ></textarea>
+              </label>
+              <button class="subtle" id="reanalyze">
+                Düzeltilmiş metni yeniden analiz et
+              </button>
+            </section>
+            <section class="card">
+              <div class="card-heading">
+                <h2>Otomasyon</h2>
+                <button id="webhook" class="subtle">n8n’e gönder ↗</button>
+              </div>
+              <p class="privacy">
+                Sunucuda yapılandırılmış webhook’a analiz verisini gönderir.
+              </p>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>
+      CV Studio
+      <span
+        >Erasmus stajından geliştirilen açık kaynak analiz çalışma alanı.</span
+      >
+      <a
+        href="https://github.com/suleymanssardogan/Erasmus-Staj-AI-Powered-CV-Analysis"
+        target="_blank"
+        rel="noopener noreferrer"
+        >GitHub ↗</a
+      >
+    </footer>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+  </body>
 </html>

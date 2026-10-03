@@ -8,9 +8,11 @@ services:
       - "5000:5000"
     volumes:
       - ./uploads:/app/uploads
+      - cv_data:/app/data
     restart: always
     environment:
-      - FLASK_ENV=production
+      - ACCOUNT_DB_PATH=/app/data/accounts.db
+      - SECRET_KEY=${SECRET_KEY:?Set SECRET_KEY in .env before starting Docker}
 
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
@@ -24,4 +26,5 @@ services:
     restart: always
 
 volumes:
+  cv_data:
   n8n_data:

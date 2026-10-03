@@ -46,7 +46,7 @@ COPY Proje/ ./Proje/
 COPY tessdata/ ./tessdata/
 
 RUN useradd --create-home --shell /bin/bash appuser && \
-    mkdir -p /app/uploads && \
+    mkdir -p /app/uploads /app/data && \
     chown -R appuser:appuser /app
 USER appuser
 

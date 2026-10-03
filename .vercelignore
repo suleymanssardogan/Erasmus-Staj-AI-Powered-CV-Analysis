@@ -15,3 +15,9 @@ tmp/
 Dockerfile
 docker-compose.yml
 requirements-full.txt
+
+accounts.db
+.session-key
+.env
+output/
+tests/
