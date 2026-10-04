@@ -2,8 +2,6 @@ from flask import Flask, request, jsonify, render_template
 import os
 import time
 import re
-import json
-import urllib.request
 import uuid
 import shutil
 from flask import redirect
@@ -15,7 +13,7 @@ from werkzeug.utils import secure_filename
 
 # OCR bağımlılıkları (Tesseract/OpenCV/Poppler) yalnızca sistem kütüphaneleriyle birlikte
 # kurulu ortamlarda (Docker imajı, yerel kurulum) mevcuttur. Bu paketler olmadan da uygulamanın
-# geri kalanının (arayüz, roadmap.sh önerileri, n8n webhook) çökmeden ayağa kalkabilmesi için
+# geri kalanının (arayüz ve metin analizi) çökmeden ayağa kalkabilmesi için
 # import'lar burada opsiyonel tutulur; OCR_AVAILABLE bayrağı /api/ocr içinde kontrol edilir.
 try:
     import cv2
@@ -226,7 +224,7 @@ def analyze_cv_content(text):
     text_lower = text.lower()
     
     # Beceriler (Skills) Tanımlamaları
-    technologies = ["Python", "Java", "C++", "C#", "JavaScript", "TypeScript", "HTML", "CSS", "React", "Vue", "Angular", "Node.js", "Django", "Flask", "FastAPI", "SQL", "PostgreSQL", "MySQL", "SQLite", "MongoDB", "Git", "GitHub", "Docker", "Kubernetes", "AWS", "Azure", "GCP", "n8n", "OpenCV", "PyTorch", "TensorFlow", "Excel", "Scrum", "Agile"]
+    technologies = ["Python", "Java", "C++", "C#", "JavaScript", "TypeScript", "HTML", "CSS", "React", "Vue", "Angular", "Node.js", "Django", "Flask", "FastAPI", "SQL", "PostgreSQL", "MySQL", "SQLite", "MongoDB", "Git", "GitHub", "Docker", "Kubernetes", "AWS", "Azure", "GCP", "OpenCV", "PyTorch", "TensorFlow", "Excel", "Scrum", "Agile"]
     skills_dict = {name: r"(?<!\w)" + re.escape(name.lower()) + r"(?!\w)" for name in technologies}
 
     found_skills = []
@@ -510,46 +508,6 @@ def analyze_text():
         return jsonify(success=False,error='Geçersiz belge adı.'),400
     return jsonify(save_private(dict(success=True, filename=filename, extracted_text=text,
                    char_count=len(text), word_count=len(text.split()), processing_time=0, metadata=metadata)))
-
-@app.route("/api/send_webhook", methods=["POST"])
-def send_webhook():
-    """Çıkarılan veriyi n8n veya belirtilen custom webhook'a yönlendirir"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({"success": False, "error": "Gönderilecek veri bulunamadı"}), 400
-        
-        webhook_url = os.environ.get("N8N_WEBHOOK_URL")
-        if not webhook_url:
-            return jsonify(success=False, error="Sunucuda N8N_WEBHOOK_URL yapılandırılmamış."), 503
-        payload = data.get("payload")
-        
-        if not webhook_url or not payload:
-            return jsonify({"success": False, "error": "Webhook URL veya veri içeriği eksik"}), 400
-        
-        # urllib ile POST isteği at
-        req_data = json.dumps(payload).encode('utf-8')
-        req = urllib.request.Request(
-            webhook_url, 
-            data=req_data, 
-            headers={'Content-Type': 'application/json'}
-        )
-        
-        with urllib.request.urlopen(req, timeout=10) as response:
-            resp_code = response.getcode()
-            resp_body = response.read(4096).decode('utf-8')
-            
-        return jsonify({
-            "success": True,
-            "message": "Webhook başarıyla tetiklendi",
-            "status_code": resp_code,
-            "response": resp_body[:500]
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Webhook gönderme hatası: {str(e)}"
-        }), 500
 
 @app.route('/api/history')
 @app.route('/api/history/<int:doc_id>')

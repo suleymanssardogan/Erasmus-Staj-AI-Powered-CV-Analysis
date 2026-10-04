@@ -13,7 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 features = Blueprint('features', __name__)
 DB_PATH = os.environ.get('ACCOUNT_DB_PATH', 'accounts.db')
-TECHNOLOGIES = ['Python', 'Java', 'C++', 'C#', 'JavaScript', 'TypeScript', 'HTML', 'CSS', 'React', 'Vue', 'Angular', 'Node.js', 'Django', 'Flask', 'FastAPI', 'SQL', 'PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'Git', 'GitHub', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP', 'n8n', 'OpenCV', 'PyTorch', 'TensorFlow', 'Pandas', 'NumPy', 'Excel', 'Scrum', 'Agile', 'REST', 'GraphQL', 'Linux', 'Figma', 'CI/CD', 'Testing']
+TECHNOLOGIES = ['Python', 'Java', 'C++', 'C#', 'JavaScript', 'TypeScript', 'HTML', 'CSS', 'React', 'Vue', 'Angular', 'Node.js', 'Django', 'Flask', 'FastAPI', 'SQL', 'PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'Git', 'GitHub', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP', 'OpenCV', 'PyTorch', 'TensorFlow', 'Pandas', 'NumPy', 'Excel', 'Scrum', 'Agile', 'REST', 'GraphQL', 'Linux', 'Figma', 'CI/CD', 'Testing']
 
 def evidence(text):
     lines = [line.strip() for line in text.splitlines() if line.strip()]

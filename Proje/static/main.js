@@ -69,7 +69,7 @@ $("drop").ondrop = (e) => {
 };
 $("sample").onclick = () => {
   $("text").value =
-    "Deniz Yılmaz\ndeniz@example.com\nİstanbul, Türkiye\nEğitim\nİstanbul Üniversitesi — Bilgisayar Mühendisliği, Lisans\nDeneyim\nSoftware Developer Intern — Erasmus, 2025\nBuilt a Flask API and reduced document processing time by 30%.\nImplemented OCR automation using Python, OpenCV, Tesseract and n8n.\nSkills\nPython, C++, JavaScript, Flask, SQL, SQLite, Git, Docker";
+    "Deniz Yılmaz\ndeniz@example.com\nİstanbul, Türkiye\nEğitim\nİstanbul Üniversitesi — Bilgisayar Mühendisliği, Lisans\nDeneyim\nSoftware Developer Intern — Erasmus, 2025\nBuilt a Flask API and reduced document processing time by 30%.\nImplemented document analysis using Python, OpenCV and Tesseract.\nSkills\nPython, C++, JavaScript, Flask, SQL, SQLite, Git, Docker";
 };
 async function analyze(text, filename = "Metin analizi") {
   return api("/api/analyze", {
@@ -289,22 +289,6 @@ $("export").onclick = () => {
   a.download = "cv-analysis.json";
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-};
-$("webhook").onclick = async () => {
-  const button = $("webhook");
-  button.disabled = true;
-  try {
-    await api("/api/send_webhook", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ payload: result }),
-    });
-    status("Analiz n8n’e gönderildi.");
-  } catch (e) {
-    status(e.message, true);
-  } finally {
-    button.disabled = false;
-  }
 };
 try {
   document.body.classList.toggle(

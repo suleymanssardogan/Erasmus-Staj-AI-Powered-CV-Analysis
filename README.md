@@ -49,10 +49,6 @@ docker compose up --build
 
 [localhost:5000](http://127.0.0.1:5000) üzerinden açılır. Hesap veritabanı Docker volume’unda saklanır. Backend OCR için `requirements-full.txt`, Tesseract tur/eng paketleri ve Poppler gerekir. Debug varsayılan kapalıdır.
 
-## n8n
-
-`Proje/n8n-ocr-workflow.json` iş akışını içe aktarın ve etkinleştirin. Sunucuda `N8N_WEBHOOK_URL` ayarlayın; arayüz keyfi hedef URL kabul etmez. Kullanıcı düğmeye bastığında açık analizi bu hedefe gönderir.
-
 ## Doğrulama
 
 ```sh
@@ -62,7 +58,7 @@ node --check Proje/static/main.js
 
 Testler beceri/kanıt çıkarımı, ilan karşılaştırması, sürüm farkları, CSRF, kayıt/giriş, kullanıcılar arası erişim, silme, süre dolumu, misafir gizliliği, dijital PDF okuma ve PDF rapor çıktısını doğrular. PostgreSQL bağlantısı canlı ortam değişkenleri sağlandıktan sonra ayrıca doğrulanmalıdır.
 
-Teknolojiler: Flask, SQLite/PostgreSQL, PDF.js, Tesseract.js, pypdf, ReportLab; opsiyonel backend Tesseract/OpenCV ve n8n.
+Teknolojiler: Flask, SQLite/PostgreSQL, PDF.js, Tesseract.js, pypdf, ReportLab; opsiyonel backend Tesseract/OpenCV.
 
 Referanslar: [PDF.js örnekleri](https://mozilla.github.io/pdf.js/examples/), [Tesseract.js](https://github.com/naptha/tesseract.js), [Psycopg](https://www.psycopg.org/psycopg3/docs/).
 

@@ -14,17 +14,5 @@ services:
       - ACCOUNT_DB_PATH=/app/data/accounts.db
       - SECRET_KEY=${SECRET_KEY:?Set SECRET_KEY in .env before starting Docker}
 
-  n8n:
-    image: docker.n8n.io/n8nio/n8n:latest
-    container_name: ocr-n8n-automation
-    ports:
-      - "5678:5678"
-    volumes:
-      - n8n_data:/home/node/.local/share/n8n
-    environment:
-      - N8N_SECURE_COOKIE=false
-    restart: always
-
 volumes:
   cv_data:
-  n8n_data:
